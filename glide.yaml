@@ -1,0 +1,4 @@
+package: themis
+import:
+- package: github.com/gin-gonic/gin
+  version: v1.1.4
