@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"themis/workitems"
+	"themis/entities"
 
 	"gopkg.in/mgo.v2"
 	"github.com/gin-gonic/gin"
@@ -43,7 +43,7 @@ func InitConfig() Configuration {
 	return configuration
 }
 
-func ConnectToDatabase(configuration Configuration) *mgo.Database {
+func ConnectToDatabase(configuration Configuration) (*mgo.Session, *mgo.Database) {
 	session, err := mgo.DialWithInfo(&mgo.DialInfo {
 		Addrs:    []string { configuration.databaseHost },
 		Username: configuration.databaseUser,
@@ -55,15 +55,17 @@ func ConnectToDatabase(configuration Configuration) *mgo.Database {
 	}
 	//defer session.Close()
 	fmt.Printf("Connected to database at %v!\n", session.LiveServers())
-	return session.DB(configuration.databaseDatabase)
+	return session, session.DB(configuration.databaseDatabase)
 }
 
 func main() {
 	configuration := InitConfig()
-	database := ConnectToDatabase(configuration)
+	session, database := ConnectToDatabase(configuration)
 	workitems.WriteToDatabase(database)
 	workItem := workitems.ReadFromDatabase(database, "newId0")
+	session.Close()
 	fmt.Printf("WorkItem data: %s %s", workItem.Id, workItem.Type)
+	
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
