@@ -25,6 +25,10 @@ type WorkItemType struct {
     Fields              map[string]WorkItemTypeField    `bson:"fields"`
 }
 
+func (workItemType *WorkItemType) getCollectionName() string {
+  return "workitemtypes"
+}
+
 /*
 WorkItemType
     id

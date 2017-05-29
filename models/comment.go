@@ -13,6 +13,10 @@ type Comment struct {
     CreatedAt           time.Time           `bson:"created_at" json:"created-at"`
 }
 
+func (comment *Comment) getCollectionName() string {
+  return "comments"
+}
+
 /*
 Comment
     id

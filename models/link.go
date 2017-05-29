@@ -29,6 +29,10 @@ type Link struct {
     Version             int                 `bson:"version"`
 }
 
+func (link *Link) getCollectionName() string {
+  return "links"
+}
+
 /*
 LinkCategory
   id

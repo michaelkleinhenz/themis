@@ -11,3 +11,7 @@ type User struct {
     ImageUrl  string          `bson:"image_url" json:"imageUrl"`
     Username	string          `bson:"username"`
 }
+
+func (user *User) getCollectionName() string {
+  return "users"
+}
