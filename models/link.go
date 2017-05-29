@@ -29,7 +29,7 @@ type Link struct {
     Version             int                 `bson:"version"`
 }
 
-func (link *Link) getCollectionName() string {
+func (link *Link) GetCollectionName() string {
   return "links"
 }
 

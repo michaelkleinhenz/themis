@@ -13,7 +13,7 @@ type Comment struct {
     CreatedAt           time.Time           `bson:"created_at" json:"created-at"`
 }
 
-func (comment *Comment) getCollectionName() string {
+func (comment *Comment) GetCollectionName() string {
   return "comments"
 }
 

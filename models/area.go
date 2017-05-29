@@ -13,7 +13,7 @@ type Area struct {
     ResolvedParentPath  string              `bson:"parent_path_resolved"`
 }
 
-func (area *Area) getCollectionName() string {
+func (area *Area) GetCollectionName() string {
   return "areas"
 }
 

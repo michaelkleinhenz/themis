@@ -16,7 +16,7 @@ type Space struct {
     Version     int             `bson:"version"`
 }
 
-func (space *Space) getCollectionName() string {
+func (space *Space) GetCollectionName() string {
   return "spaces"
 }
 

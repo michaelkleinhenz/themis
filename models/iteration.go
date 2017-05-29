@@ -18,7 +18,7 @@ type Iteration struct {
     ResolvedParentPath  string              `bson:"parent_path_resolved"`
 }
 
-func (iteration *Iteration) getCollectionName() string {
+func (iteration *Iteration) GetCollectionName() string {
   return "iterations"
 }
 

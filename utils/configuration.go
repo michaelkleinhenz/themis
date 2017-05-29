@@ -7,7 +7,7 @@ import (
 )
 
 type Configuration struct {
-    ServicePort int
+    ServicePort string
     DatabaseHost  string
 		DatabasePort int
 		DatabaseDatabase  string
@@ -25,7 +25,7 @@ func Load() Configuration {
 	if err != nil {
 		fmt.Println("Config file not found..")
 	} else {
-		configuration.ServicePort = viper.GetInt("service.port")
+		configuration.ServicePort = viper.GetString("service.port")
 
 		configuration.DatabaseHost = viper.GetString("database.host")
 		configuration.DatabasePort = viper.GetInt("database.port")
@@ -33,7 +33,7 @@ func Load() Configuration {
 		configuration.DatabaseUser = viper.GetString("database.user")
 		configuration.DatabasePassword = viper.GetString("database.password")
 
-		fmt.Printf("\nUsing configuration:\n service port = %d\n database host = %s\n", 
+		fmt.Printf("\nUsing configuration:\n service port = %s\n database host = %s\n", 
 			configuration.ServicePort, configuration.DatabaseHost)
 	}
 	return configuration

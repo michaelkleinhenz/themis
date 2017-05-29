@@ -12,6 +12,6 @@ type User struct {
     Username	string          `bson:"username"`
 }
 
-func (user *User) getCollectionName() string {
+func (user *User) GetCollectionName() string {
   return "users"
 }
