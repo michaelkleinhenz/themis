@@ -1,8 +1,6 @@
 package utils
 
 import (
-	"fmt"
-
 	"github.com/spf13/viper"
 )
 
@@ -23,7 +21,7 @@ func Load() Configuration {
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		fmt.Println("Config file not found..")
+		ErrorLog.Println("Config file not found..")
 	} else {
 		configuration.ServicePort = viper.GetString("service.port")
 
@@ -33,7 +31,7 @@ func Load() Configuration {
 		configuration.DatabaseUser = viper.GetString("database.user")
 		configuration.DatabasePassword = viper.GetString("database.password")
 
-		fmt.Printf("\nUsing configuration:\n service port = %s\n database host = %s\n", 
+		ErrorLog.Printf("\nUsing configuration:\n service port = %s\n database host = %s\n", 
 			configuration.ServicePort, configuration.DatabaseHost)
 	}
 	return configuration

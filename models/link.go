@@ -1,97 +1,100 @@
 package models
 
 import (
+  "time"
+
+	"github.com/manyminds/api2go/jsonapi"
 	"gopkg.in/mgo.v2/bson"
 )
 
-type LinkCategory struct {
-    Id                  bson.ObjectId       `bson:"_id,omitempty" json:"id"`
-    Type                string              `bson:"type"`
-    Name                string              `bson:"name"`
-    Description         string              `bson:"description"`
-    Version             int                 `bson:"version"`
-}
-
-type LinkType struct {
-    Id                  bson.ObjectId       `bson:"_id,omitempty" json:"id"`
-    Type                string              `bson:"type"`
-    Name                string              `bson:"name"`
-    Description         string              `bson:"description"`
-    ForwardName         string              `bson:"forward_name"`
-    ReverseName         string              `bson:"reverse_name"`
-    Topology            string              `bson:"topology"`
-    Version             int                 `bson:"version"`
-}
-
+// Link is a link between two WorkItems.
 type Link struct {
-    Id                  bson.ObjectId       `bson:"_id,omitempty" json:"id"`
-    Type                string              `bson:"type"`
-    Version             int                 `bson:"version"`
+    ID                  bson.ObjectId       `bson:"_id,omitempty" jsonapi:"-"`
+    Version             int                 `bson:"version" jsonapi:"version"`
+		LinkTypeID	  			bson.ObjectId				`bson:"linktype" jsonapi:"-"`
+		SourceWorkItemID	  bson.ObjectId				`bson:"source_workitem" jsonapi:"-"`
+		TargetWorkItemID	 	bson.ObjectId				`bson:"target_workitem" jsonapi:"-"`
+    SpaceID             bson.ObjectId       `bson:"space_id" jsonapi:"-"`
+    CreatedAt 	        time.Time    		    `bson:"created_at" json:"-"`
+    UpdatedAt 	        time.Time		        `bson:"updated_at" json:"-"`
 }
 
-func (link *Link) GetCollectionName() string {
+// NewLink creates a new Link instance.
+func NewLink() (link *Link) {
+  link = new(Link)
+	link.CreatedAt = time.Now()
+	link.UpdatedAt = time.Now()
+  return link
+}
+
+// GetCollectionName returns the database collection name.
+func (link Link) GetCollectionName() string {
   return "links"
 }
 
-/*
-LinkCategory
-  id
-  type
-  attributes
-    name
-    description
-    version
+// GetID returns the ID for marshalling to json.
+func (link Link) GetID() string {
+  return link.ID.Hex()
+}
 
-LinkType
-  id
-  type
-  attributes
-    description
-    forward_name
-    name
-    reverse_name
-    topology 
-    version
-  relationships
-    link_category
-      data
-        id
-        type
-    source_type
-      data
-        id
-        type
-    target_type
-      data
-        id
-        type
+// SetID sets the ID for marshalling to json.
+func (link Link) SetID(id string) error {
+  link.ID = bson.ObjectIdHex(id)
+  return nil
+}
 
-Link
-  id
-  type
-  attributes
-    version
-  relationships
-    link_type
-      data
-        id
-        type
-    source
-      data
-        id
-        type
-    target
-      data
-        id
-        type
-  relationalData
-    source
-      title
-      id
-      state
-    target
-      title
-      id
-      state
-    linkType
-*/
+// GetName returns the entity type name for marshalling to json.
+func (link Link) GetName() string {
+  return link.GetCollectionName()
+}
+
+// GetReferences to satisfy the jsonapi.MarshalReferences interface
+func (link Link) GetReferences() []jsonapi.Reference {
+	return []jsonapi.Reference{
+		{
+			Type: "linktypes",
+			Name: "link_type",
+			IsNotLoaded: false, // we want to have the data field
+		},
+		{
+			Type: "workitems",
+			Name: "source",
+			IsNotLoaded: false, // we want to have the data field
+		},
+		{
+			Type: "workitems",
+			Name: "target",
+			IsNotLoaded: false, // we want to have the data field
+		},
+	}
+}
+
+// GetReferencedIDs to satisfy the jsonapi.MarshalLinkedRelations interface
+func (link Link) GetReferencedIDs() []jsonapi.ReferenceID {
+  result := []jsonapi.ReferenceID {
+			jsonapi.ReferenceID {
+	    	ID:   link.LinkTypeID.Hex(),
+ 	   		Type: "linktypes",
+ 	   		Name: "link_type",
+			},
+			jsonapi.ReferenceID {
+	    	ID:   link.SourceWorkItemID.Hex(),
+ 	   		Type: "workitems",
+ 	   		Name: "source",
+			},
+			jsonapi.ReferenceID {
+	    	ID:   link.TargetWorkItemID.Hex(),
+ 	   		Type: "workitems",
+ 	   		Name: "target",
+			},
+	}
+	return result
+}
+
+// GetCustomLinks returns the custom links, namely the self link.
+func (link Link) GetCustomLinks(linkURL string) jsonapi.Links {
+	links := jsonapi.Links {
+		"self": jsonapi.Link { linkURL, nil, },
+	}
+	return links
+}

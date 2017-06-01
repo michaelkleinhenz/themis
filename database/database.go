@@ -1,8 +1,6 @@
 package database
 
 import (
-	"fmt"
-
 	"gopkg.in/mgo.v2"
 
 	"themis/utils"
@@ -19,7 +17,7 @@ func Connect(configuration utils.Configuration) (*mgo.Session, *mgo.Database) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Connected to database at %v!\n", session.LiveServers())
+	utils.InfoLog.Printf("Connected to database at %v!\n", session.LiveServers())
 	return session, session.DB(configuration.DatabaseDatabase)
 }
 
@@ -27,3 +25,4 @@ func Connect(configuration utils.Configuration) (*mgo.Session, *mgo.Database) {
 func Close(database *mgo.Database) {
 	database.Session.Close()
 }
+

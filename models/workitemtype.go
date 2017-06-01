@@ -1,52 +1,75 @@
 package models
 
 import (
+  "time"
+
 	"gopkg.in/mgo.v2/bson"
+  "github.com/manyminds/api2go/jsonapi"
 )
 
-type WorkItemTypeField struct {
-    Id                  bson.ObjectId       `bson:"_id,omitempty" json:"id"`
-    Description         string              `bson:"description"`
-    Label               string              `bson:"name"`
-    Required            bool                `bson:"required"`
-    ComponentType       string              `bson:"component_type" json:"componentType"`
-    BaseType            string              `bson:"base_type" json:"baseType"`
-    Kind                string              `bson:"kind"`
-    Values              []string            `bson:"values"`
+// WorkItemTypeFieldDescriptor is a descriptor for a specific field.
+type WorkItemTypeFieldDescriptor struct {
+    ComponentType       string              `bson:"component_type" jsonapi:"componentType"`
+    BaseType            string              `bson:"base_type" jsonapi:"baseType"`
+    Kind                string              `bson:"kind" jsonapi:"kind"`
+    Values              []string            `bson:"values" jsonapi:"values"`
 }
 
+// WorkItemTypeField describes a schema field.
+type WorkItemTypeField struct {
+    Description         string                      `bson:"description" jsonapi:"description"`
+    Label               string                      `bson:"name" jsonapi:"name"`
+    Required            bool                        `bson:"required" jsonapi:"required"`
+    Type                WorkItemTypeFieldDescriptor `bson:"type" jsonapi:"type"`
+}
+
+// WorkItemType describes a schema type.
 type WorkItemType struct {
-    Id                  bson.ObjectId                   `bson:"_id,omitempty" json:"id"`
+    ID                  bson.ObjectId                   `bson:"_id,omitempty" json:"-"`
     Type                string                          `bson:"type"`
     Name                string                          `bson:"name"`
     Description         string                          `bson:"description"`
     Version             int                             `bson:"version"`
     Icon                string                          `bson:"icon"`
     Fields              map[string]WorkItemTypeField    `bson:"fields"`
+    SpaceID             bson.ObjectId                   `bson:"space_id" jsonapi:"-"`
+    CreatedAt 	        time.Time  		                  `bson:"created_at" json:"-"`
+    UpdatedAt 	        time.Time		                    `bson:"updated_at" json:"-"`
 }
 
-func (workItemType *WorkItemType) GetCollectionName() string {
+// NewWorkItemType creates a new WorkItemType instance.
+func NewWorkItemType() (workItemType *WorkItemType) {
+  workItemType = new(WorkItemType)
+  workItemType.CreatedAt = time.Now()
+	workItemType.UpdatedAt = time.Now()
+  return workItemType
+}
+
+// GetCollectionName returns the database collection name.
+func (workItemType WorkItemType) GetCollectionName() string {
   return "workitemtypes"
 }
 
-/*
-WorkItemType
-    id
-    type
-    attributes
-        name
-        version
-        description
-        icon
-        fields (Map<string, WorkItemTypeField>)
+// GetID returns the ID for marshalling to json.
+func (workItemType WorkItemType) GetID() string {
+  return workItemType.ID.Hex()
+}
 
-WorkItemTypeField
-    description
-    label
-    required (boolean)
-    type
-        componentType
-        baseType
-        kind
-        values (string[])
-*/
+// SetID sets the ID for marshalling to json.
+func (workItemType WorkItemType) SetID(id string) error {
+  workItemType.ID = bson.ObjectIdHex(id)
+  return nil
+}
+
+// GetName returns the entity type name for marshalling to json.
+func (workItemType WorkItemType) GetName() string {
+  return workItemType.GetCollectionName()
+}
+
+// GetCustomLinks returns the custom links, namely the self link.
+func (workItemType WorkItemType) GetCustomLinks(linkURL string) jsonapi.Links {
+	links := jsonapi.Links {
+		"self": jsonapi.Link { linkURL, nil, },
+	}
+	return links
+}
