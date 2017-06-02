@@ -1,11 +1,11 @@
 package main
 
 import (
-	"strconv"
+	//"strconv"
 
 	"github.com/manyminds/api2go"
 	"github.com/manyminds/api2go-adapter/gingonic"
-	"github.com/manyminds/api2go/jsonapi"
+	//"github.com/manyminds/api2go/jsonapi"
 	"gopkg.in/gin-gonic/gin.v1"
 
 	"themis/database"
@@ -22,6 +22,7 @@ func main() {
 	//session, db := database.Connect(configuration)
 	_, db := database.Connect(configuration)
 
+	/*
 	// TEST SERIALIZATION
 	wi1 := models.NewWorkItem()
 	wi1.Attributes["blah1"] = "blubb1"
@@ -31,6 +32,7 @@ func main() {
 		utils.ErrorLog.Println(err.Error())
 	}
 	utils.DebugLog.Printf("%s\n", json)
+	*/
 
 	// creating all storage backends
 	spaceStorage := database.NewSpaceStorage(db)
@@ -44,6 +46,7 @@ func main() {
 	linkTypeStorage := database.NewLinkTypeStorage(db)
 	userStorage := database.NewUserStorage(db)
 
+	/*
 	// TEST DATABASE
 	// space
 	exampleSpace := models.NewSpace()
@@ -61,7 +64,7 @@ func main() {
 		retrievedWorkItem.Attributes["blah"+strconv.Itoa(i)] = "blubb" + strconv.Itoa(i)
 		workItemStorage.Update(retrievedWorkItem)
 	}
-
+	*/
 	//workItemStorage.Delete(retrievedWorkItem.GetID())
 	//session.Close()
 

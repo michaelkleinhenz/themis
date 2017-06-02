@@ -79,17 +79,6 @@ func (space Space) GetReferencedIDs() []jsonapi.ReferenceID {
 
 // GetCustomLinks returns the custom links, namely the self link.
 func (space Space) GetCustomLinks(linkURL string) jsonapi.Links {
-		/*
-	links := jsonapi.Links {
-		"self": jsonapi.Link {
-		  "linkURL",
-    	map[string]interface{} {
-				"metaKey1": "metaValue1",
-			},
-		},
-	}
-	*/
-
 	links := jsonapi.Links {
 		"self": jsonapi.Link { linkURL, nil, },
 		"workitemlinktypes": jsonapi.Link { linkURL + "/linktypes", nil, },
@@ -106,4 +95,14 @@ func (space Space) GetCustomLinks(linkURL string) jsonapi.Links {
 				},
 	*/
 	return links
+}
+
+// GetCustomMeta returns the custom meta.
+func (space Space) GetCustomMeta(linkURL string) jsonapi.Metas {
+	meta := map[string]map[string]interface{} {
+		"workitems": map[string]interface{} {
+			"someMetaKey": "someMetaValue",
+		},
+	}
+	return meta
 }

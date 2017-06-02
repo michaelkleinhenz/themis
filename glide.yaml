@@ -2,6 +2,9 @@ package: themis
 import:
 - package: github.com/gin-gonic/gin
 - package: github.com/spf13/viper
+- package: github.com/manyminds/api2go
+  subpackages:
+  - jsonapi
 - package: gopkg.in/mgo.v2
   subpackages:
   - bson
