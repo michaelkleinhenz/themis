@@ -4,8 +4,12 @@ import (
 	"github.com/spf13/viper"
 )
 
+const ModeProduction = "production"
+const ModeDevelopment = "development"
+
 type Configuration struct {
     ServicePort string
+		ServiceMode string
     DatabaseHost  string
 		DatabasePort int
 		DatabaseDatabase  string
@@ -24,6 +28,7 @@ func Load() Configuration {
 		ErrorLog.Println("Config file not found..")
 	} else {
 		configuration.ServicePort = viper.GetString("service.port")
+		configuration.ServiceMode = viper.GetString("service.mode")
 
 		configuration.DatabaseHost = viper.GetString("database.host")
 		configuration.DatabasePort = viper.GetInt("database.port")

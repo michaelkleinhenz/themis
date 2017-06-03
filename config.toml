@@ -1,5 +1,6 @@
 [service]
 port = ":8080"
+mode = "development"
 
 [database]
 host = "localhost"  

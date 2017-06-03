@@ -1,7 +1,11 @@
 package: themis
 import:
 - package: github.com/gin-gonic/gin
+- package: gopkg.in/check.v1
+- package: gopkg.in/tomb.v2
 - package: github.com/spf13/viper
+- package: github.com/onsi/ginkgo
+- package: github.com/onsi/gomega
 - package: github.com/manyminds/api2go
   subpackages:
   - jsonapi
