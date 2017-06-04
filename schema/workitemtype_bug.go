@@ -1,13 +1,13 @@
-package fixtures
+package schema
 
 import (
 	"themis/models"
 )
 
-func createWorkItemTypeTask() models.WorkItemType {
+func createWorkItemTypeBug() models.WorkItemType {
 	workItemType := models.NewWorkItemType()
-	workItemType.Name = "Task"
-	workItemType.Description = "A story task."
+	workItemType.Name = "Bug"
+	workItemType.Description = "A software defect."
 	workItemType.Version = 0
 	workItemType.Icon = "fa fa-bolt"
 	workItemType.Fields = map[string]models.WorkItemTypeField{

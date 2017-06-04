@@ -1,5 +1,6 @@
 package main
 
+/*
 import (
 	"github.com/manyminds/api2go"
 	"github.com/manyminds/api2go-adapter/gingonic"
@@ -10,7 +11,14 @@ import (
 	"themis/resources"
 	"themis/routes"
 	"themis/utils"
-	"themis/fixtures"
+	"themis/schema"
+)
+*/
+
+import (
+	"themis/database"
+	"themis/utils"
+	"themis/schema"
 )
 
 func main() {
@@ -34,7 +42,7 @@ func main() {
 		User: database.NewUserStorage(db),
 	}
 
-	fixtures.SetupFixtureData(storageBackends)
+	schema.SetupFixtureData(storageBackends)
 
 /*
 	// run the service

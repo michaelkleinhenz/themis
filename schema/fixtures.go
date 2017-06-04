@@ -1,4 +1,4 @@
-package fixtures
+package schema
 
 import (
 	"gopkg.in/mgo.v2/bson"
@@ -30,7 +30,7 @@ func SetupFixtureData(storageBackends database.StorageBackends) {
 	utils.DebugLog.Printf("Created Mock Space with ID: %s\n", mockSpace.ID.Hex())
 
 	// create schema for space
-	createSchemaInDatabase(mockSpace.ID, storageBackends)
+	createSchemaForSpaceInStorage(mockSpace.ID, storageBackends)
 
 	// create areas: root -> a -> b
 	mockRootArea := models.NewArea()
@@ -70,6 +70,7 @@ func SetupFixtureData(storageBackends database.StorageBackends) {
 	mockIterationB.SpaceID = mockSpace.ID
 	storageBackends.Iteration.Insert(*mockIterationB)
 	
+	// TODO Some WorkItems
 	/*
 	// workitem
 	for i := 0; i < 100; i++ {
@@ -84,4 +85,8 @@ func SetupFixtureData(storageBackends database.StorageBackends) {
 	//workItemStorage.Delete(retrievedWorkItem.GetID())
 	//session.Close()
 	*/
+
+	// TODO Some Comments
+
+	// TODO Some Links
 }

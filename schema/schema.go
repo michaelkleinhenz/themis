@@ -1,4 +1,4 @@
-package fixtures
+package schema
 
 import (
 	"gopkg.in/mgo.v2/bson"
@@ -7,7 +7,7 @@ import (
 	"themis/database"
 )
 
-func createSchemaInDatabase(spaceID bson.ObjectId, storageBackends database.StorageBackends) {
+func createSchemaForSpaceInStorage(spaceID bson.ObjectId, storageBackends database.StorageBackends) {
 	// TODO create workitemtypes
 	// TODO link space
 

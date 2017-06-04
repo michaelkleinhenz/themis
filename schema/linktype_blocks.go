@@ -1,4 +1,4 @@
-package fixtures
+package schema
 
 import (
 	"themis/models"
