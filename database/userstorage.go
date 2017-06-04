@@ -32,7 +32,7 @@ func (UserStorage *UserStorage) Insert(user models.User) (bson.ObjectId, error) 
 		utils.ErrorLog.Printf("Error while inserting new User with ID %s into database: %s", user.ID, err.Error())
 		return "", err
 	}
-	utils.DebugLog.Printf("Inserted new User with ID %s into database.", user.ID.String())
+	utils.DebugLog.Printf("Inserted new User with ID %s into database.", user.ID.Hex())
 	return user.ID, nil
 }
 
@@ -44,7 +44,7 @@ func (UserStorage *UserStorage) Update(user models.User) error {
 		return errors.New("Given User instance has an empty ID. Can not be updated in the database")
 	}
 	if err := coll.UpdateId(user.ID, user); err != nil {
-		utils.ErrorLog.Printf("Error while updating User with ID %s in database: %s", user.ID, err.Error())
+		utils.ErrorLog.Printf("Error while updating User with ID %s in database: %s", user.ID.Hex(), err.Error())
 		return err
 	}
 	utils.DebugLog.Printf("Updated User with ID %s in database.", user.ID.String())
@@ -63,7 +63,7 @@ func (UserStorage *UserStorage) Delete(id bson.ObjectId) error {
 		utils.ErrorLog.Printf("Error while deleting User with ID %s in database: %s", id, err.Error())
 		return err
 	}
-	utils.DebugLog.Printf("Deleted %d User with ID %s from database.", info.Removed, id)
+	utils.DebugLog.Printf("Deleted %d User with ID %s from database.", info.Removed, id.Hex())
 	return nil
 }
 
@@ -76,10 +76,10 @@ func (UserStorage *UserStorage) GetOne(id bson.ObjectId) (models.User, error) {
 		return *user, errors.New("Given User id is empty")
 	}
 	if err := coll.Find(bson.M{"_id": id}).One(user); err != nil {
-		utils.ErrorLog.Printf("Error while retrieving User with ID %s from database: %s", user.ID, err.Error())
+		utils.ErrorLog.Printf("Error while retrieving User with ID %s from database: %s", user.ID.Hex(), err.Error())
 		return *user, err
 	}
-	utils.DebugLog.Printf("Retrieved User with ID %s from database.", user.ID.String())
+	utils.DebugLog.Printf("Retrieved User with ID %s from database.", user.ID.Hex())
 	return *user, nil
 }
 

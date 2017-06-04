@@ -5,24 +5,25 @@ import (
 	"time"
 	"io/ioutil"
 
-	. "themis/mockdb"
-
 	"gopkg.in/mgo.v2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
+	"themis/mockdb"
 )
 
 var _ = Describe("Dbserver", func() {
 
 	type M map[string]interface{}
 	var oldCheckSessions string
-	var server DBServer
+	var server dbserver.DBServer
 
 	BeforeEach(func() {
 		oldCheckSessions = os.Getenv("CHECK_SESSIONS")
 		os.Setenv("CHECK_SESSIONS", "1")
 		dir, _ := ioutil.TempDir("", "themis_test")
 		server.SetPath(dir)
+		
 		defer server.Stop()
 	})
 

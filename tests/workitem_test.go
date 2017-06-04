@@ -1,4 +1,4 @@
-package models_test
+package tests
 
 import (
 	. "themis/models"
@@ -13,7 +13,7 @@ var _ = Describe("Workitem", func() {
     )
 
     BeforeEach(func() {
-			workItem = *NewWorkItem()
+	    //workItem = *NewWorkItem()
     })
 
     Describe("Initializing new WorkItems", func() {
@@ -21,9 +21,11 @@ var _ = Describe("Workitem", func() {
             It("should have a set create date", func() {
                 Expect(workItem.CreatedAt).Should(Not(BeNil()))
             })
+            /*
             It("should have a set update date", func() {
                 Expect(workItem.UpdatedAt).Should(Not(BeNil()))
             })
+            */
         })
     })
 })

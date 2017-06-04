@@ -10,9 +10,6 @@ import (
 	"themis/utils"
 )
 
-var mockSpace models.Space
-var mockUser models.User
-
 // SetupFixtureData creates a mock data set for the tests to operate on.
 func SetupFixtureData(storageBackends database.StorageBackends) {
 
@@ -66,7 +63,7 @@ func SetupFixtureData(storageBackends database.StorageBackends) {
 	for i := 0; i < 10; i++ {
 		thisWorkItem := models.NewWorkItem()
 		thisWorkItem.SpaceID = mockSpace.ID
-		thisWorkItem.BaseTypeID = *workItemTypeIDs[0]
+		thisWorkItem.BaseTypeID = workItemTypeIDs[0]
 		thisWorkItem.Attributes["system.title"] = "Title 0-" + strconv.Itoa(i)
 		thisWorkItem.Attributes["system.description"] = "Description 0-" + strconv.Itoa(i)
 		thisWorkItem.Attributes["system.creator"] = mockUser.ID.Hex()
@@ -74,14 +71,16 @@ func SetupFixtureData(storageBackends database.StorageBackends) {
 		thisWorkItem.Attributes["system.created_at"] = thisWorkItem.CreatedAt.String()
 		thisWorkItem.Attributes["system.updated_at"] = thisWorkItem.UpdatedAt.String()
 		thisWorkItem.Attributes["system.area"] = rootAreaID.Hex()
+		thisWorkItem.AreaID = *rootAreaID
 		thisWorkItem.Attributes["system.iteration"] = rootIterationID.Hex()
+		thisWorkItem.IterationID = *rootIterationID
 		thisWorkItem.Attributes["system.state"] = "new"
 		thisWorkItem.ID, _ = storageBackends.WorkItem.Insert(*thisWorkItem)
 	}
 	for i := 0; i < 10; i++ {
 		thisWorkItem := models.NewWorkItem()
 		thisWorkItem.SpaceID = mockSpace.ID
-		thisWorkItem.BaseTypeID = *workItemTypeIDs[0]
+		thisWorkItem.BaseTypeID = workItemTypeIDs[0]
 		thisWorkItem.Attributes["system.title"] = "Title 1-" + strconv.Itoa(i)
 		thisWorkItem.Attributes["system.description"] = "Description 1-" + strconv.Itoa(i)
 		thisWorkItem.Attributes["system.creator"] = mockUser.ID.Hex()
@@ -89,7 +88,9 @@ func SetupFixtureData(storageBackends database.StorageBackends) {
 		thisWorkItem.Attributes["system.created_at"] = thisWorkItem.CreatedAt.String()
 		thisWorkItem.Attributes["system.updated_at"] = thisWorkItem.UpdatedAt.String()
 		thisWorkItem.Attributes["system.area"] = mockAreaA.ID.Hex()
+		thisWorkItem.AreaID = *rootAreaID
 		thisWorkItem.Attributes["system.iteration"] = mockIterationA.ID.Hex()
+		thisWorkItem.IterationID = *rootIterationID
 		thisWorkItem.Attributes["system.state"] = "new"
 		thisWorkItem.ID, _ = storageBackends.WorkItem.Insert(*thisWorkItem)
 	}

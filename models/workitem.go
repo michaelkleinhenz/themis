@@ -16,9 +16,9 @@ type WorkItem struct {
 	CreatedAt        time.Time         `bson:"created_at" json:"-"`
 	UpdatedAt        time.Time         `bson:"updated_at" json:"-"`
 	AreaID           bson.ObjectId     `bson:"area" jsonapi:"-"`
-	Assignees        []bson.ObjectId   `bson:"assignees" jsonapi:"-"`
+	Assignees        []bson.ObjectId   `bson:"assignees,omitempty" jsonapi:"-"`
 	BaseTypeID       bson.ObjectId     `bson:"base_workitemtype_id" jsonapi:"-"`
-	ParentWorkItemID bson.ObjectId     `bson:"parent_workitem_id" jsonapi:"-"`
+	ParentWorkItemID bson.ObjectId     `bson:"parent_workitem_id,omitempty" jsonapi:"-"`
 	CreatorID        bson.ObjectId     `bson:"creator_id" jsonapi:"-"`
 	IterationID      bson.ObjectId     `bson:"iteration_id" jsonapi:"-"`
 }
