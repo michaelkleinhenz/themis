@@ -49,6 +49,7 @@ func main() {
 		api2go.NewStaticResolver("/"),
 		gingonic.New(r),
 	)
+	r.StaticFile("/", "./static/index.html")
 	api.AddResource(models.Space{}, resources.SpaceResource{SpaceStorage: storageBackends.Space})
 	api.AddResource(models.WorkItem{}, resources.WorkItemResource{WorkItemStorage: storageBackends.WorkItem})
 	api.AddResource(models.Area{}, resources.AreaResource{AreaStorage: storageBackends.Area})
