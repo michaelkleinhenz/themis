@@ -25,13 +25,13 @@ type WorkItemTypeField struct {
 
 // WorkItemType describes a schema type.
 type WorkItemType struct {
-    ID                  bson.ObjectId                   `bson:"_id,omitempty" json:"-"`
-    Type                string                          `bson:"type"`
-    Name                string                          `bson:"name"`
-    Description         string                          `bson:"description"`
-    Version             int                             `bson:"version"`
-    Icon                string                          `bson:"icon"`
-    Fields              map[string]WorkItemTypeField    `bson:"fields"`
+    ID                  bson.ObjectId                   `bson:"_id,omitempty" jsonapi:"-"`
+    RefID               string                          `bson:"-" jsonapi:"-"`
+    Name                string                          `bson:"name" jsonapi:"name"`
+    Description         string                          `bson:"description" jsonapi:"description"`
+    Version             int                             `bson:"version" jsonapi:"version"`
+    Icon                string                          `bson:"icon" jsonapi:"icon"`
+    Fields              map[string]WorkItemTypeField    `bson:"fields" jsonapi:"fields"`
     SpaceID             bson.ObjectId                   `bson:"space_id" jsonapi:"-"`
     CreatedAt 	        time.Time  		                  `bson:"created_at" json:"-"`
     UpdatedAt 	        time.Time		                    `bson:"updated_at" json:"-"`

@@ -5,7 +5,8 @@ import (
 )
 
 func createWorkItemTypeBug() models.WorkItemType {
-	workItemType := models.NewWorkItemType()
+	workItemType := models.NewWorkItemType()	
+	workItemType.RefID = "bug"
 	workItemType.Name = "Bug"
 	workItemType.Description = "A software defect."
 	workItemType.Version = 0

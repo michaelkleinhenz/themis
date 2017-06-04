@@ -6,6 +6,7 @@ import (
 
 func createWorkItemTypeTask() models.WorkItemType {
 	workItemType := models.NewWorkItemType()
+	workItemType.RefID = "task"
 	workItemType.Name = "Task"
 	workItemType.Description = "A story task."
 	workItemType.Version = 0

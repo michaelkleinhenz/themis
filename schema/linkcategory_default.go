@@ -6,6 +6,7 @@ import (
 
 func createLinkCategoryDefault() models.LinkCategory {
 	linkCategory := models.NewLinkCategory()
+	linkCategory.RefID = "default"
 	linkCategory.Name = "Default Link Category"
 	linkCategory.Description = "The default link category."
 	linkCategory.Version = 0

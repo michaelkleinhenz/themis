@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"strconv"
+
 	"gopkg.in/mgo.v2/bson"
 
 	"themis/database"
@@ -25,68 +27,70 @@ func SetupFixtureData(storageBackends database.StorageBackends) {
 	mockSpace := models.NewSpace()
 	mockSpace.Name = "Some Space Name"
 	mockSpace.Description = "Some Space Description"
-	mockSpace.OwnerIDs = []bson.ObjectId { mockUser.ID }
+	mockSpace.OwnerIDs = []bson.ObjectId{mockUser.ID}
 	mockSpace.ID, _ = storageBackends.Space.Insert(*mockSpace)
 	utils.DebugLog.Printf("Created Mock Space with ID: %s\n", mockSpace.ID.Hex())
 
 	// create schema for space
-	createSchemaForSpaceInStorage(mockSpace.ID, storageBackends)
+	workItemTypeIDs, rootAreaID, rootIterationID, _ := createSchemaForSpaceInStorage(mockSpace.ID, storageBackends)
 
 	// create areas: root -> a -> b
-	mockRootArea := models.NewArea()
-	mockRootArea.Name = "Root Area Name"
-	mockRootArea.Description = "Root Area Description"
-	mockRootArea.SpaceID = mockSpace.ID
-	rootAreaID, _ := storageBackends.Area.Insert(*mockRootArea)
 	mockAreaA := models.NewArea()
 	mockAreaA.Name = "Area A Name"
 	mockAreaA.Description = "Area A Description"
-	mockAreaA.ParentAreaID = rootAreaID
+	mockAreaA.ParentAreaID = *rootAreaID
 	mockAreaA.SpaceID = mockSpace.ID
-	mockAreaAID, _ := storageBackends.Area.Insert(*mockAreaA)
+	mockAreaA.ID, _ = storageBackends.Area.Insert(*mockAreaA)
 	mockAreaB := models.NewArea()
 	mockAreaB.Name = "Area B Name"
 	mockAreaB.Description = "Area B Description"
-	mockAreaB.ParentAreaID = mockAreaAID
+	mockAreaB.ParentAreaID = mockAreaA.ID
 	mockAreaB.SpaceID = mockSpace.ID
-	storageBackends.Area.Insert(*mockAreaB)
+	mockAreaB.ID, _ = storageBackends.Area.Insert(*mockAreaB)
 
 	// create iterations: root -> a -> b
-	mockRootIteration := models.NewIteration()
-	mockRootIteration.Name = "Root Iteration Name"
-	mockRootIteration.Description = "Root Iteration Description"
-	mockRootIteration.SpaceID = mockSpace.ID
-	rootIterationID, _ := storageBackends.Iteration.Insert(*mockRootIteration)
 	mockIterationA := models.NewIteration()
 	mockIterationA.Name = "Iteration A Name"
 	mockIterationA.Description = "Iteration A Description"
-	mockIterationA.ParentIterationID = rootIterationID
+	mockIterationA.ParentIterationID = *rootIterationID
 	mockIterationA.SpaceID = mockSpace.ID
-	mockIterationAID, _ := storageBackends.Iteration.Insert(*mockIterationA)
+	mockIterationA.ID, _ = storageBackends.Iteration.Insert(*mockIterationA)
 	mockIterationB := models.NewIteration()
 	mockIterationB.Name = "Iteration B Name"
 	mockIterationB.Description = "Iteration B Description"
-	mockIterationB.ParentIterationID = mockIterationAID
+	mockIterationB.ParentIterationID = mockIterationA.ID
 	mockIterationB.SpaceID = mockSpace.ID
-	storageBackends.Iteration.Insert(*mockIterationB)
-	
-	// TODO Some WorkItems
-	/*
-	// workitem
-	for i := 0; i < 100; i++ {
-		exampleWorkItem := models.NewWorkItem()
-		exampleWorkItem.SpaceID = retrievedSpace.ID
-		newWorkItemID, _ := storageBackends.WorkItem.Insert(*exampleWorkItem)
-		retrievedWorkItem, _ := storageBackends.WorkItem.GetOne(newWorkItemID)
-		utils.DebugLog.Printf("Retrieved WorkItem: %s\n", retrievedWorkItem.ID.String())
-		retrievedWorkItem.Attributes["blah"+strconv.Itoa(i)] = "blubb" + strconv.Itoa(i)
-		storageBackends.WorkItem.Update(retrievedWorkItem)
+	mockIterationB.ID, _ = storageBackends.Iteration.Insert(*mockIterationB)
+
+	// create some WorkItems
+	for i := 0; i < 10; i++ {
+		thisWorkItem := models.NewWorkItem()
+		thisWorkItem.SpaceID = mockSpace.ID
+		thisWorkItem.BaseTypeID = *workItemTypeIDs[0]
+		thisWorkItem.Attributes["system.title"] = "Title 0-" + strconv.Itoa(i)
+		thisWorkItem.Attributes["system.description"] = "Description 0-" + strconv.Itoa(i)
+		thisWorkItem.Attributes["system.creator"] = mockUser.ID.Hex()
+		thisWorkItem.CreatorID = mockUser.ID
+		thisWorkItem.Attributes["system.created_at"] = thisWorkItem.CreatedAt.String()
+		thisWorkItem.Attributes["system.updated_at"] = thisWorkItem.UpdatedAt.String()
+		thisWorkItem.Attributes["system.area"] = rootAreaID.Hex()
+		thisWorkItem.Attributes["system.iteration"] = rootIterationID.Hex()
+		thisWorkItem.Attributes["system.state"] = "new"
+		thisWorkItem.ID, _ = storageBackends.WorkItem.Insert(*thisWorkItem)
 	}
-	//workItemStorage.Delete(retrievedWorkItem.GetID())
-	//session.Close()
-	*/
-
-	// TODO Some Comments
-
-	// TODO Some Links
+	for i := 0; i < 10; i++ {
+		thisWorkItem := models.NewWorkItem()
+		thisWorkItem.SpaceID = mockSpace.ID
+		thisWorkItem.BaseTypeID = *workItemTypeIDs[0]
+		thisWorkItem.Attributes["system.title"] = "Title 1-" + strconv.Itoa(i)
+		thisWorkItem.Attributes["system.description"] = "Description 1-" + strconv.Itoa(i)
+		thisWorkItem.Attributes["system.creator"] = mockUser.ID.Hex()
+		thisWorkItem.CreatorID = mockUser.ID
+		thisWorkItem.Attributes["system.created_at"] = thisWorkItem.CreatedAt.String()
+		thisWorkItem.Attributes["system.updated_at"] = thisWorkItem.UpdatedAt.String()
+		thisWorkItem.Attributes["system.area"] = mockAreaA.ID.Hex()
+		thisWorkItem.Attributes["system.iteration"] = mockIterationA.ID.Hex()
+		thisWorkItem.Attributes["system.state"] = "new"
+		thisWorkItem.ID, _ = storageBackends.WorkItem.Insert(*thisWorkItem)
+	}
 }

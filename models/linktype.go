@@ -22,6 +22,9 @@ type LinkType struct {
 		SpaceID             	bson.ObjectId       `bson:"space_id" jsonapi:"-"`
     CreatedAt 	        	time.Time  		    	`bson:"created_at" json:"-"`
     UpdatedAt 	        	time.Time		    		`bson:"updated_at" json:"-"`
+    CategoryRef           string              `bson:"-" jsonapi:"-"`
+    SourceWorkItemTypeRef string              `bson:"-" jsonapi:"-"`
+    TargetWorkItemTypeRef string              `bson:"-" jsonapi:"-"`
 }
 
 // NewLinkType creates a new LinkType instance.
