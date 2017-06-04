@@ -14,6 +14,7 @@ type Area struct {
     Description         string              `bson:"description" jsonapi:"description"`
     ParentPath          string              `bson:"parent_path" jsonapi:"parent_path"`
     ResolvedParentPath  string              `bson:"parent_path_resolved" jsonapi:"parent_path_resolved"`
+    ParentAreaID        bson.ObjectId       `bson:"parent_area_id" jsonapi:"-"`
     SpaceID             bson.ObjectId       `bson:"space_id" jsonapi:"-"`
     CreatedAt 	        time.Time   		    `bson:"created_at" json:"-"`
     UpdatedAt 	        time.Time				    `bson:"updated_at" json:"-"`

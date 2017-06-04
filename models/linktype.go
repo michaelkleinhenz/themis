@@ -71,6 +71,11 @@ func (linkType LinkType) GetReferences() []jsonapi.Reference {
 			Name: "target_type",
 			IsNotLoaded: false, // we want to have the data field
 		},
+		{
+			Type: "spaces",
+			Name: "space",
+			IsNotLoaded: false, // we want to have the data field
+		},
 	}
 }
 
@@ -91,6 +96,11 @@ func (linkType LinkType) GetReferencedIDs() []jsonapi.ReferenceID {
 	    	ID:   linkType.TargetWorkItemTypeID.Hex(),
  	   		Type: "workitemtypes",
  	   		Name: "target_type",
+			},
+			jsonapi.ReferenceID{
+				ID:   linkType.SpaceID.Hex(),
+				Type: "spaces",
+				Name: "space",
 			},
 	}
 	return result

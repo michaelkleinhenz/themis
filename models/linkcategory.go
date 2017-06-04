@@ -47,6 +47,29 @@ func (linkCategory LinkCategory) GetName() string {
   return linkCategory.GetCollectionName()
 }
 
+// GetReferences to satisfy the jsonapi.MarshalReferences interface
+func (linkCategory LinkCategory) GetReferences() []jsonapi.Reference {
+	return []jsonapi.Reference{
+		{
+			Type:        "spaces",
+			Name:        "space",
+			IsNotLoaded: false, // we want to have the data field
+		},
+	}
+}
+
+// GetReferencedIDs to satisfy the jsonapi.MarshalLinkedRelations interface
+func (linkCategory LinkCategory) GetReferencedIDs() []jsonapi.ReferenceID {
+	result := []jsonapi.ReferenceID{
+		jsonapi.ReferenceID{
+			ID:   linkCategory.SpaceID.Hex(),
+			Type: "spaces",
+			Name: "space",
+		},
+	}
+	return result
+}
+
 // GetCustomLinks returns the custom links, namely the self link.
 func (linkCategory LinkCategory) GetCustomLinks(linkURL string) jsonapi.Links {
 	links := jsonapi.Links {

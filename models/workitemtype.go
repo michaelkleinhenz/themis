@@ -66,6 +66,30 @@ func (workItemType WorkItemType) GetName() string {
   return workItemType.GetCollectionName()
 }
 
+// GetReferences to satisfy the jsonapi.MarshalReferences interface
+func (workItemType WorkItemType) GetReferences() []jsonapi.Reference {
+	return []jsonapi.Reference{
+		{
+			Type:        "spaces",
+			Name:        "space",
+			IsNotLoaded: false, // we want to have the data field
+		},
+	}
+}
+
+// GetReferencedIDs to satisfy the jsonapi.MarshalLinkedRelations interface
+func (workItemType WorkItemType) GetReferencedIDs() []jsonapi.ReferenceID {
+	result := []jsonapi.ReferenceID{
+		jsonapi.ReferenceID{
+			ID:   workItemType.SpaceID.Hex(),
+			Type: "spaces",
+			Name: "space",
+		},
+	}
+	return result
+}
+
+
 // GetCustomLinks returns the custom links, namely the self link.
 func (workItemType WorkItemType) GetCustomLinks(linkURL string) jsonapi.Links {
 	links := jsonapi.Links {

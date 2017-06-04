@@ -36,6 +36,7 @@ func main() {
 
 	fixtures.SetupFixtureData(storageBackends)
 
+/*
 	// run the service
 	if (configuration.ServiceMode == utils.ModeProduction) {
 		gin.SetMode(gin.ReleaseMode)
@@ -60,4 +61,5 @@ func main() {
 	api.AddResource(models.WorkItemType{}, resources.WorkItemTypeResource{WorkItemTypeStorage: storageBackends.WorkItemType})
 	routes.Init(r)
 	r.Run(configuration.ServicePort)
+	*/
 }

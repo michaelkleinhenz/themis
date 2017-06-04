@@ -9,12 +9,14 @@ import (
 
 // Space is a project in Themis context.
 type Space struct {
-    ID        	bson.ObjectId		`bson:"_id,omitempty" jsonapi:"-"`
-		CreatedAt 	time.Time   		`bson:"created_at" jsonapi:"created-at"`
-    UpdatedAt 	time.Time				`bson:"updated_at" jsonapi:"updated-at"`
-    Name        string          `bson:"name" jsonapi:"name"`
-    Description string          `bson:"description" jsonapi:"description"`
-    Version     int             `bson:"version" jsonapi:"version"`
+    ID        			bson.ObjectId		`bson:"_id,omitempty" jsonapi:"-"`
+		CreatedAt 			time.Time   		`bson:"created_at" jsonapi:"created-at"`
+    UpdatedAt 			time.Time				`bson:"updated_at" jsonapi:"updated-at"`
+    Name        		string          `bson:"name" jsonapi:"name"`
+    Description 		string          `bson:"description" jsonapi:"description"`
+    Version     		int             `bson:"version" jsonapi:"version"`
+    CollaboratorIDs []bson.ObjectId	`bson:"collaborator_ids" jsonapi:"-"`
+    OwnerIDs 				[]bson.ObjectId	`bson:"owner_ids" jsonapi:"-"`
 }
 
 // NewSpace creates a new Space instance.
@@ -83,6 +85,7 @@ func (space Space) GetCustomLinks(linkURL string) jsonapi.Links {
 		"self": jsonapi.Link { linkURL, nil, },
 		"workitemlinktypes": jsonapi.Link { linkURL + "/linktypes", nil, },
 		"workitemtypes": jsonapi.Link { linkURL + "/workitemtypes", nil, },
+		//TODO "workitemlinkcategories": jsonapi.Link { linkURL + "/workitemlinkcategories", nil, },
 		// TODO "filters": "https://xxx/api/filters",
 	}
 	/*

@@ -23,7 +23,7 @@ type Iteration struct {
 	ResolvedParentPath string        `bson:"parent_path_resolved" jsonapi:"parent_path_resolved"`
 	CreatedAt          time.Time     `bson:"created_at" jsonapi:"created-at"`
 	UpdatedAt          time.Time     `bson:"updated_at" jsonapi:"-"`
-	ParentID           bson.ObjectId `bson:"parent_iteration_id" jsonapi:"-"`
+	ParentIterationID  bson.ObjectId `bson:"parent_iteration_id" jsonapi:"-"`
 	SpaceID            bson.ObjectId `bson:"space_id" jsonapi:"-"`
 }
 
@@ -86,7 +86,7 @@ func (iteration Iteration) GetReferencedIDs() []jsonapi.ReferenceID {
 			Name: "space",
 		},
 		jsonapi.ReferenceID{
-			ID:   iteration.ParentID.Hex(),
+			ID:   iteration.ParentIterationID.Hex(),
 			Type: "iterations",
 			Name: "parent",
 		},
