@@ -1,6 +1,5 @@
 package main
 
-/*
 import (
 	"github.com/manyminds/api2go"
 	"github.com/manyminds/api2go-adapter/gingonic"
@@ -10,13 +9,6 @@ import (
 	"themis/models"
 	"themis/resources"
 	"themis/routes"
-	"themis/utils"
-	"themis/schema"
-)
-*/
-
-import (
-	"themis/database"
 	"themis/utils"
 	"themis/schema"
 )
@@ -42,9 +34,9 @@ func main() {
 		User: database.NewUserStorage(db),
 	}
 
+	// only for testing, setup an example dataset in storage
 	schema.SetupFixtureData(storageBackends)
 
-/*
 	// run the service
 	if (configuration.ServiceMode == utils.ModeProduction) {
 		gin.SetMode(gin.ReleaseMode)
@@ -69,5 +61,4 @@ func main() {
 	api.AddResource(models.WorkItemType{}, resources.WorkItemTypeResource{WorkItemTypeStorage: storageBackends.WorkItemType})
 	routes.Init(r)
 	r.Run(configuration.ServicePort)
-	*/
 }
