@@ -19,13 +19,18 @@ type WorkItemTypeResource struct {
 
 // FindAll WorkItemTypes.
 func (c WorkItemTypeResource) FindAll(r api2go.Request) (api2go.Responder, error) {
-	workItemTypes, _ := c.WorkItemTypeStorage.GetAll(nil)
+	// build filter expression
+	var filter interface{} = utils.BuildDbFilterFromRequest(r)
+	workItemTypes, _ := c.WorkItemTypeStorage.GetAll(filter)
 	return &api2go.Response{Res: workItemTypes}, nil
 }
 
 // PaginatedFindAll can be used to load users in chunks.
 // Possible success status code 200.
 func (c WorkItemTypeResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Responder, error) {
+
+	// build filter expression
+	var filter interface{} = utils.BuildDbFilterFromRequest(r)
 
 	// parse out offset and limit
 	queryOffset, queryLimit, err := utils.ParsePaging(r)
@@ -34,13 +39,13 @@ func (c WorkItemTypeResource) PaginatedFindAll(r api2go.Request) (uint, api2go.R
 	}
 
 	// get the paged data from storage
-	result, err := c.WorkItemTypeStorage.GetAllPaged(nil, queryOffset, queryLimit)
+	result, err := c.WorkItemTypeStorage.GetAllPaged(filter, queryOffset, queryLimit)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}
 
 	// get total count for paging
-	allCount, err := c.WorkItemTypeStorage.GetAllCount(nil)
+	allCount, err := c.WorkItemTypeStorage.GetAllCount(filter)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}

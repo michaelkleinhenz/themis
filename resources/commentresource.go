@@ -19,13 +19,18 @@ type CommentResource struct {
 
 // FindAll Comments.
 func (c CommentResource) FindAll(r api2go.Request) (api2go.Responder, error) {
-	comments, _ := c.CommentStorage.GetAll(nil)
+	// build filter expression
+	var filter interface{} = utils.BuildDbFilterFromRequest(r)
+	comments, _ := c.CommentStorage.GetAll(filter)
 	return &api2go.Response{Res: comments}, nil
 }
 
 // PaginatedFindAll can be used to load users in chunks.
 // Possible success status code 200.
 func (c CommentResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Responder, error) {
+
+	// build filter expression
+	var filter interface{} = utils.BuildDbFilterFromRequest(r)
 
 	// parse out offset and limit
 	queryOffset, queryLimit, err := utils.ParsePaging(r)
@@ -34,13 +39,13 @@ func (c CommentResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Respon
 	}
 
 	// get the paged data from storage
-	result, err := c.CommentStorage.GetAllPaged(nil, queryOffset, queryLimit)
+	result, err := c.CommentStorage.GetAllPaged(filter, queryOffset, queryLimit)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}
 
 	// get total count for paging
-	allCount, err := c.CommentStorage.GetAllCount(nil)
+	allCount, err := c.CommentStorage.GetAllCount(filter)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}

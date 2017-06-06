@@ -20,19 +20,12 @@ type WorkItemResource struct {
 // FindAll WorkItems.
 func (c WorkItemResource) FindAll(r api2go.Request) (api2go.Responder, error) {
 	utils.DebugLog.Printf("Received FindAll with params %s.", r.QueryParams)
-	// we only want workitems on a space
-	spaceID, ok := utils.GetSpaceID(r)
-	if ok {
-		// this means that we want to show all workItems of a space, route /api/spaces/xyz/workitems
-		workItems, err := c.WorkItemStorage.GetAll(bson.M{"space": bson.ObjectIdHex(spaceID)})
-		if err != nil {
-			return &api2go.Response{}, err
-		}
-		return &api2go.Response{Res: workItems}, nil
-	} 
-	// we want all workitems
-	// TODO we might want to limit that here
-	workItems, err := c.WorkItemStorage.GetAll(nil)	
+
+	// build filter expression
+	var filter interface{} = utils.BuildDbFilterFromRequest(r)
+
+	// retrieve entities
+	workItems, err := c.WorkItemStorage.GetAll(filter)	
 	if err != nil {
 		return &api2go.Response{}, err
 	}
@@ -48,14 +41,17 @@ func (c WorkItemResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Respo
 		return 0, &api2go.Response{}, err
 	}
 
+	// build filter expression
+	var filter interface{} = utils.BuildDbFilterFromRequest(r)
+
 	// get the paged data from storage
-	result, err := c.WorkItemStorage.GetAllPaged(nil, queryOffset, queryLimit)
+	result, err := c.WorkItemStorage.GetAllPaged(filter, queryOffset, queryLimit)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}
 
 	// get total count for paging
-	allCount, err := c.WorkItemStorage.GetAllCount(nil)
+	allCount, err := c.WorkItemStorage.GetAllCount(filter)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}

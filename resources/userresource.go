@@ -19,13 +19,18 @@ type UserResource struct {
 
 // FindAll Users.
 func (c UserResource) FindAll(r api2go.Request) (api2go.Responder, error) {
-	users, _ := c.UserStorage.GetAll(nil)
+	// build filter expression
+	var filter interface{} = utils.BuildDbFilterFromRequest(r)
+	users, _ := c.UserStorage.GetAll(filter)
 	return &api2go.Response{Res: users}, nil
 }
 
 // PaginatedFindAll can be used to load users in chunks.
 // Possible success status code 200.
 func (c UserResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Responder, error) {
+
+	// build filter expression
+	var filter interface{} = utils.BuildDbFilterFromRequest(r)
 
 	// parse out offset and limit
 	queryOffset, queryLimit, err := utils.ParsePaging(r)
@@ -34,13 +39,13 @@ func (c UserResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Responder
 	}
 
 	// get the paged data from storage
-	result, err := c.UserStorage.GetAllPaged(nil, queryOffset, queryLimit)
+	result, err := c.UserStorage.GetAllPaged(filter, queryOffset, queryLimit)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}
 
 	// get total count for paging
-	allCount, err := c.UserStorage.GetAllCount(nil)
+	allCount, err := c.UserStorage.GetAllCount(filter)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}

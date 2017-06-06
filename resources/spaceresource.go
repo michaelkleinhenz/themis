@@ -19,13 +19,18 @@ type SpaceResource struct {
 
 // FindAll Spaces.
 func (c SpaceResource) FindAll(r api2go.Request) (api2go.Responder, error) {
-	spaces, _ := c.SpaceStorage.GetAll(nil)
+	// build filter expression
+	var filter interface{} = utils.BuildDbFilterFromRequest(r)
+	spaces, _ := c.SpaceStorage.GetAll(filter)
 	return &api2go.Response{Res: spaces}, nil
 }
 
 // PaginatedFindAll can be used to load users in chunks.
 // Possible success status code 200.
 func (c SpaceResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Responder, error) {
+
+	// build filter expression
+	var filter interface{} = utils.BuildDbFilterFromRequest(r)
 
 	// parse out offset and limit
 	queryOffset, queryLimit, err := utils.ParsePaging(r)
@@ -34,13 +39,13 @@ func (c SpaceResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Responde
 	}
 
 	// get the paged data from storage
-	result, err := c.SpaceStorage.GetAllPaged(nil, queryOffset, queryLimit)
+	result, err := c.SpaceStorage.GetAllPaged(filter, queryOffset, queryLimit)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}
 
 	// get total count for paging
-	allCount, err := c.SpaceStorage.GetAllCount(nil)
+	allCount, err := c.SpaceStorage.GetAllCount(filter)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}

@@ -19,13 +19,18 @@ type IterationResource struct {
 
 // FindAll Iterations.
 func (c IterationResource) FindAll(r api2go.Request) (api2go.Responder, error) {
-	iterations, _ := c.IterationStorage.GetAll(nil)
+	// build filter expression
+	var filter interface{} = utils.BuildDbFilterFromRequest(r)
+	iterations, _ := c.IterationStorage.GetAll(filter)
 	return &api2go.Response{Res: iterations}, nil
 }
 
 // PaginatedFindAll can be used to load users in chunks.
 // Possible success status code 200.
 func (c IterationResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Responder, error) {
+
+	// build filter expression
+	var filter interface{} = utils.BuildDbFilterFromRequest(r)
 
 	// parse out offset and limit
 	queryOffset, queryLimit, err := utils.ParsePaging(r)
@@ -34,13 +39,13 @@ func (c IterationResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Resp
 	}
 
 	// get the paged data from storage
-	result, err := c.IterationStorage.GetAllPaged(nil, queryOffset, queryLimit)
+	result, err := c.IterationStorage.GetAllPaged(filter, queryOffset, queryLimit)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}
 
 	// get total count for paging
-	allCount, err := c.IterationStorage.GetAllCount(nil)
+	allCount, err := c.IterationStorage.GetAllCount(filter)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}

@@ -84,10 +84,10 @@ func (SpaceStorage *SpaceStorage) GetOne(id bson.ObjectId) (models.Space, error)
 }
 
 // GetAll returns an entity from the database based on a given ID.
-func (SpaceStorage *SpaceStorage) GetAll() ([]models.Space, error) {
+func (SpaceStorage *SpaceStorage) GetAll(queryExpression interface{}) ([]models.Space, error) {
 	allSpaces := new([]models.Space)
 	coll := SpaceStorage.database.C("spaces")
-	if err := coll.Find(nil).All(allSpaces); err != nil {
+	if err := coll.Find(queryExpression).All(allSpaces); err != nil {
 		utils.ErrorLog.Printf("Error while retrieving all Spaces from database: %s", err.Error())
 		return nil, err
 	}
@@ -96,12 +96,12 @@ func (SpaceStorage *SpaceStorage) GetAll() ([]models.Space, error) {
 }
 
 // GetAllPaged returns a subset based on offset and limit.
-func (SpaceStorage *SpaceStorage) GetAllPaged(offset int, limit int) ([]models.Space, error) {
+func (SpaceStorage *SpaceStorage) GetAllPaged(queryExpression interface{}, offset int, limit int) ([]models.Space, error) {
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allSpaces := new([]models.Space)
 	coll := SpaceStorage.database.C("spaces")
-  query := coll.Find(nil).Sort("updated_at").Limit(limit)
+  query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allSpaces); err != nil { 
     utils.ErrorLog.Printf("Error while retrieving paged Spaces from database: %s", err.Error())

@@ -19,13 +19,18 @@ type LinkCategoryResource struct {
 
 // FindAll LinkCategorys.
 func (c LinkCategoryResource) FindAll(r api2go.Request) (api2go.Responder, error) {
-	linkCategorys, _ := c.LinkCategoryStorage.GetAll(nil)
+	// build filter expression
+	var filter interface{} = utils.BuildDbFilterFromRequest(r)
+	linkCategorys, _ := c.LinkCategoryStorage.GetAll(filter)
 	return &api2go.Response{Res: linkCategorys}, nil
 }
 
 // PaginatedFindAll can be used to load users in chunks.
 // Possible success status code 200.
 func (c LinkCategoryResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Responder, error) {
+
+	// build filter expression
+	var filter interface{} = utils.BuildDbFilterFromRequest(r)
 
 	// parse out offset and limit
 	queryOffset, queryLimit, err := utils.ParsePaging(r)
@@ -34,13 +39,13 @@ func (c LinkCategoryResource) PaginatedFindAll(r api2go.Request) (uint, api2go.R
 	}
 
 	// get the paged data from storage
-	result, err := c.LinkCategoryStorage.GetAllPaged(nil, queryOffset, queryLimit)
+	result, err := c.LinkCategoryStorage.GetAllPaged(filter, queryOffset, queryLimit)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}
 
 	// get total count for paging
-	allCount, err := c.LinkCategoryStorage.GetAllCount(nil)
+	allCount, err := c.LinkCategoryStorage.GetAllCount(filter)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}

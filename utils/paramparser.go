@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/manyminds/api2go"
+	"gopkg.in/mgo.v2/bson"
 )
 
 func GetPathID(r api2go.Request, typeStr string) (string, bool) {
@@ -13,6 +14,15 @@ func GetPathID(r api2go.Request, typeStr string) (string, bool) {
 		return spaceID, true
 	}
 	return "", false
+}
+
+func BuildDbFilterFromRequest(r api2go.Request) interface{} {
+	var filter interface{}
+	spaceID, ok := GetSpaceID(r)
+	if ok {
+		filter = bson.M{"space": bson.ObjectIdHex(spaceID)}
+	} 
+	return filter
 }
 
 func GetSpaceID(r api2go.Request) (string, bool) {
