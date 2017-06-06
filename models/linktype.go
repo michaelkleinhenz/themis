@@ -46,7 +46,7 @@ func (linkType LinkType) GetID() string {
 }
 
 // SetID sets the ID for marshalling to json.
-func (linkType LinkType) SetID(id string) error {
+func (linkType *LinkType) SetID(id string) error {
   linkType.ID = bson.ObjectIdHex(id)
   return nil
 }

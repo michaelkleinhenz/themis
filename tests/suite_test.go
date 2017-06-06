@@ -3,6 +3,7 @@ package tests
 import (
 	"testing"
 	"os"
+	"io"
 	"io/ioutil"
 
 	. "github.com/onsi/ginkgo"
@@ -35,6 +36,7 @@ func TestModels(t *testing.T) {
 var _ = BeforeSuite(func() {
 	// setup logger
 	utils.InitLogger()
+	utils.SetLogFile("test.log")
 	// test configuration
 		configuration = utils.Configuration {
 		ServiceURL: "http://localhost:8080",
@@ -69,7 +71,9 @@ var _ = BeforeSuite(func() {
 	SpaceID = schema.SetupFixtureData(storageBackends)
 	// launch service
 	gin.SetMode(gin.ReleaseMode)
+	gin.DefaultWriter = io.MultiWriter(utils.LogFile)
 	r := gin.Default()
+	r.Use(gin.Logger())
 	api := api2go.NewAPIWithRouting(
 		"api",
 		api2go.NewStaticResolver(configuration.ServiceURL),
@@ -90,8 +94,9 @@ var _ = BeforeSuite(func() {
 	go r.Run(configuration.ServicePort)
 })
 
-var _ = AfterSuite(func() {
+var _ = AfterSuite(func() {	
 	session.Close()
 	dbServer.Wipe()
 	dbServer.Stop()
+	utils.CloseLogfile()
 })

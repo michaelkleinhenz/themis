@@ -38,7 +38,7 @@ func (link Link) GetID() string {
 }
 
 // SetID sets the ID for marshalling to json.
-func (link Link) SetID(id string) error {
+func (link *Link) SetID(id string) error {
   link.ID = bson.ObjectIdHex(id)
   return nil
 }

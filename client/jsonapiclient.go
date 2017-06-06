@@ -81,7 +81,7 @@ func GetSpace(apiURL string, spaceID string) (*models.Space, map[string]interfac
 		return nil, nil, err
 	}
 	var msgMapTemplate interface{}
-	err = json.Unmarshal([]byte(result), &msgMapTemplate)
+	err = json.Unmarshal(result, &msgMapTemplate)
 	if err != nil {
 		return nil, nil, err
 	}	

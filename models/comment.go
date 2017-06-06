@@ -36,7 +36,7 @@ func (comment Comment) GetID() string {
 }
 
 // SetID sets the ID for marshalling to json.
-func (comment Comment) SetID(id string) error {
+func (comment *Comment) SetID(id string) error {
   comment.ID = bson.ObjectIdHex(id)
   return nil
 }

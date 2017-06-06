@@ -39,7 +39,7 @@ func (area Area) GetID() string {
 }
 
 // SetID sets the ID for marshalling to json.
-func (area Area) SetID(id string) error {
+func (area *Area) SetID(id string) error {
   area.ID = bson.ObjectIdHex(id)
   return nil
 }

@@ -9,8 +9,6 @@ import (
 )
 
 var _ = Describe("Space Service", func() {
-		//var space models.Space
-
     BeforeEach(func() {
 	    //space = *NewSpace()
     })
@@ -18,11 +16,11 @@ var _ = Describe("Space Service", func() {
     Describe("Querying Space Service", func() {
         Context("With no parameters", func() {
             It("should return a valid space", func() {
-							_, rawData, err := client.GetSpace(configuration.ServiceURL, SpaceID)
-							//space = *thisSpace
-							resultID := ((rawData["data"].(map[string]interface{})["attributes"]).(map[string]interface{})["ID"]).(string)
-							Expect(resultID).Should(Equal(SpaceID))
+							resultSpace, rawData, err := client.GetSpace(configuration.ServiceURL, SpaceID)
 							Expect(err).Should(BeNil())
+							resultID := ((rawData["data"].(map[string]interface{})["id"])).(string)
+							Expect(resultID).Should(Equal(SpaceID))
+							Expect(resultSpace.ID.Hex()).Should(Equal(SpaceID))
             })
         })
     })

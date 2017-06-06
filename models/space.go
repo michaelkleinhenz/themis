@@ -37,8 +37,8 @@ func (space Space) GetID() string {
   return space.ID.Hex()
 }
 
-// SetID sets the ID for marshalling to json.
-func (space Space) SetID(id string) error {
+// SetID sets the ID for unmarshalling from json.
+func (space *Space) SetID(id string) error {
   space.ID = bson.ObjectIdHex(id)
   return nil
 }

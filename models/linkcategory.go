@@ -38,7 +38,7 @@ func (linkCategory LinkCategory) GetID() string {
 }
 
 // SetID sets the ID for marshalling to json.
-func (linkCategory LinkCategory) SetID(id string) error {
+func (linkCategory *LinkCategory) SetID(id string) error {
   linkCategory.ID = bson.ObjectIdHex(id)
   return nil
 }

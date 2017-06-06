@@ -51,7 +51,7 @@ func (workItem WorkItem) GetID() string {
 }
 
 // SetID sets the ID for marshalling to json.
-func (workItem WorkItem) SetID(id string) error {
+func (workItem *WorkItem) SetID(id string) error {
 	workItem.ID = bson.ObjectIdHex(id)
 	return nil
 }

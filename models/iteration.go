@@ -46,7 +46,7 @@ func (iteration Iteration) GetID() string {
 }
 
 // SetID sets the ID for marshalling to json.
-func (iteration Iteration) SetID(id string) error {
+func (iteration *Iteration) SetID(id string) error {
 	iteration.ID = bson.ObjectIdHex(id)
 	return nil
 }
