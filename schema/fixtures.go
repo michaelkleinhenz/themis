@@ -11,7 +11,7 @@ import (
 )
 
 // SetupFixtureData creates a mock data set for the tests to operate on.
-func SetupFixtureData(storageBackends database.StorageBackends) {
+func SetupFixtureData(storageBackends database.StorageBackends) string {
 
 	// create a user
 	mockUser := models.NewUser()
@@ -94,4 +94,6 @@ func SetupFixtureData(storageBackends database.StorageBackends) {
 		thisWorkItem.Attributes["system.state"] = "new"
 		thisWorkItem.ID, _ = storageBackends.WorkItem.Insert(*thisWorkItem)
 	}
+
+	return mockSpace.ID.Hex()
 }

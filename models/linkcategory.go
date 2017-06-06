@@ -9,14 +9,14 @@ import (
 
 // LinkCategory is a link category.
 type LinkCategory struct {
-    ID                  bson.ObjectId `bson:"_id,omitempty" jsonapi:"-"`
-    RefID               string        `bson:"-" jsonapi:"-"`
-    Name                string        `bson:"name" jsonapi:"name"`
-    Description         string        `bson:"description" jsonapi:"description"`
-    Version             int           `bson:"version" jsonapi:"version"`
-    SpaceID             bson.ObjectId `bson:"space_id" jsonapi:"-"`
-    CreatedAt 	        time.Time  		`bson:"created_at" jsonapi:"-"`
-		UpdatedAt 	        time.Time		  `bson:"updated_at" jsonapi:"-"`
+    ID                  bson.ObjectId `bson:"_id,omitempty" json:"-"`
+    RefID               string        `bson:"-" json:"-"`
+    Name                string        `bson:"name" json:"name"`
+    Description         string        `bson:"description" json:"description"`
+    Version             int           `bson:"version" json:"version"`
+    SpaceID             bson.ObjectId `bson:"space_id" json:"-"`
+    CreatedAt 	        time.Time  		`bson:"created_at" json:"-"`
+		UpdatedAt 	        time.Time		  `bson:"updated_at" json:"-"`
 }
 
 // NewLinkCategory creates a new LinkCategory instance.

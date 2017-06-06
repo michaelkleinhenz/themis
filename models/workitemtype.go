@@ -9,30 +9,30 @@ import (
 
 // WorkItemTypeFieldDescriptor is a descriptor for a specific field.
 type WorkItemTypeFieldDescriptor struct {
-    ComponentType       string              `bson:"component_type" jsonapi:"componentType"`
-    BaseType            string              `bson:"base_type" jsonapi:"baseType"`
-    Kind                string              `bson:"kind" jsonapi:"kind"`
-    Values              []string            `bson:"values" jsonapi:"values"`
+    ComponentType       string              `bson:"component_type" json:"componentType"`
+    BaseType            string              `bson:"base_type" json:"baseType"`
+    Kind                string              `bson:"kind" json:"kind"`
+    Values              []string            `bson:"values" json:"values"`
 }
 
 // WorkItemTypeField describes a schema field.
 type WorkItemTypeField struct {
-    Description         string                      `bson:"description" jsonapi:"description"`
-    Label               string                      `bson:"name" jsonapi:"name"`
-    Required            bool                        `bson:"required" jsonapi:"required"`
-    Type                WorkItemTypeFieldDescriptor `bson:"type" jsonapi:"type"`
+    Description         string                      `bson:"description" json:"description"`
+    Label               string                      `bson:"name" json:"name"`
+    Required            bool                        `bson:"required" json:"required"`
+    Type                WorkItemTypeFieldDescriptor `bson:"type" json:"type"`
 }
 
 // WorkItemType describes a schema type.
 type WorkItemType struct {
-    ID                  bson.ObjectId                   `bson:"_id,omitempty" jsonapi:"-"`
-    RefID               string                          `bson:"-" jsonapi:"-"`
-    Name                string                          `bson:"name" jsonapi:"name"`
-    Description         string                          `bson:"description" jsonapi:"description"`
-    Version             int                             `bson:"version" jsonapi:"version"`
-    Icon                string                          `bson:"icon" jsonapi:"icon"`
-    Fields              map[string]WorkItemTypeField    `bson:"fields" jsonapi:"fields"`
-    SpaceID             bson.ObjectId                   `bson:"space_id" jsonapi:"-"`
+    ID                  bson.ObjectId                   `bson:"_id,omitempty" json:"-"`
+    RefID               string                          `bson:"-" json:"-"`
+    Name                string                          `bson:"name" json:"name"`
+    Description         string                          `bson:"description" json:"description"`
+    Version             int                             `bson:"version" json:"version"`
+    Icon                string                          `bson:"icon" json:"icon"`
+    Fields              map[string]WorkItemTypeField    `bson:"fields" json:"fields"`
+    SpaceID             bson.ObjectId                   `bson:"space_id" json:"-"`
     CreatedAt 	        time.Time  		                  `bson:"created_at" json:"-"`
     UpdatedAt 	        time.Time		                    `bson:"updated_at" json:"-"`
 }

@@ -8,16 +8,24 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/mgo.v2"
+	"github.com/manyminds/api2go"
+	"github.com/manyminds/api2go-adapter/gingonic"
+	"gopkg.in/gin-gonic/gin.v1"
 
 	"themis/schema"
+	"themis/resources"
+	"themis/models"
 	"themis/database"
 	"themis/mockdb"
+	"themis/routes"
 	"themis/utils"
 )
 
 type M map[string]interface{}
 var dbServer dbserver.DBServer
 var session *mgo.Session
+var configuration utils.Configuration
+var SpaceID string
 
 func TestModels(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -27,12 +35,23 @@ func TestModels(t *testing.T) {
 var _ = BeforeSuite(func() {
 	// setup logger
 	utils.InitLogger()
+	// test configuration
+		configuration = utils.Configuration {
+		ServiceURL: "http://localhost:8080",
+    ServicePort: ":8080",
+		ServiceMode: "production",
+    DatabaseHost: "localhost",
+		DatabasePort: 27017,
+		DatabaseDatabase: "themis",
+		DatabaseUser: "themis",
+		DatabasePassword: "themis",
+	}
 	// launch test database instance
 	os.Setenv("CHECK_SESSIONS", "1")
 	dir, _ := ioutil.TempDir("", "themis_test")
 	dbServer.SetPath(dir)
 	session = dbServer.Session()
-	db := session.DB("themis_test")
+	db := session.DB(configuration.DatabaseDatabase)
 	// creating all storage backends
 	storageBackends := database.StorageBackends {
 		Space: database.NewSpaceStorage(db),
@@ -47,7 +66,28 @@ var _ = BeforeSuite(func() {
 		User: database.NewUserStorage(db),
 	}
 	// setup test fixtures
-	schema.SetupFixtureData(storageBackends)
+	SpaceID = schema.SetupFixtureData(storageBackends)
+	// launch service
+	gin.SetMode(gin.ReleaseMode)
+	r := gin.Default()
+	api := api2go.NewAPIWithRouting(
+		"api",
+		api2go.NewStaticResolver(configuration.ServiceURL),
+		gingonic.New(r),
+	)
+	r.StaticFile("/", "./static/index.html")
+	api.AddResource(models.Space{}, resources.SpaceResource{SpaceStorage: storageBackends.Space})
+	api.AddResource(models.WorkItem{}, resources.WorkItemResource{WorkItemStorage: storageBackends.WorkItem})
+	api.AddResource(models.Area{}, resources.AreaResource{AreaStorage: storageBackends.Area})
+	api.AddResource(models.Comment{}, resources.CommentResource{CommentStorage: storageBackends.Comment})
+	api.AddResource(models.Iteration{}, resources.IterationResource{IterationStorage: storageBackends.Iteration})
+	api.AddResource(models.Link{}, resources.LinkResource{LinkStorage: storageBackends.Link})
+	api.AddResource(models.LinkCategory{}, resources.LinkCategoryResource{LinkCategoryStorage: storageBackends.LinkCategory})
+	api.AddResource(models.LinkType{}, resources.LinkTypeResource{LinkTypeStorage: storageBackends.LinkType})
+	api.AddResource(models.User{}, resources.UserResource{UserStorage: storageBackends.User})
+	api.AddResource(models.WorkItemType{}, resources.WorkItemTypeResource{WorkItemTypeStorage: storageBackends.WorkItemType})
+	routes.Init(r)
+	go r.Run(configuration.ServicePort)
 })
 
 var _ = AfterSuite(func() {

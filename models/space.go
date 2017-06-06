@@ -9,14 +9,14 @@ import (
 
 // Space is a project in Themis context.
 type Space struct {
-    ID        			bson.ObjectId		`bson:"_id,omitempty" jsonapi:"-"`
-		CreatedAt 			time.Time   		`bson:"created_at" jsonapi:"created-at"`
-    UpdatedAt 			time.Time				`bson:"updated_at" jsonapi:"updated-at"`
-    Name        		string          `bson:"name" jsonapi:"name"`
-    Description 		string          `bson:"description" jsonapi:"description"`
-    Version     		int             `bson:"version" jsonapi:"version"`
-    CollaboratorIDs []bson.ObjectId	`bson:"collaborator_ids" jsonapi:"-"`
-    OwnerIDs 				[]bson.ObjectId	`bson:"owner_ids" jsonapi:"-"`
+    ID        			bson.ObjectId		`bson:"_id,omitempty" json:"-"`
+		CreatedAt 			time.Time   		`bson:"created_at" json:"created-at"`
+    UpdatedAt 			time.Time				`bson:"updated_at" json:"updated-at"`
+    Name        		string          `bson:"name" json:"name"`
+    Description 		string          `bson:"description" json:"description"`
+    Version     		int             `bson:"version" json:"version"`
+    CollaboratorIDs []bson.ObjectId	`bson:"collaborator_ids" json:"-"`
+    OwnerIDs 				[]bson.ObjectId	`bson:"owner_ids" json:"-"`
 }
 
 // NewSpace creates a new Space instance.
@@ -108,4 +108,14 @@ func (space Space) GetCustomMeta(linkURL string) jsonapi.Metas {
 		},
 	}
 	return meta
+}
+
+// SetToOneReferenceID unmarshals toOne relationships.
+func (space Space) SetToOneReferenceID(name, ID string) error {
+	return nil
+}
+
+// SetToManyReferenceIDs unmarshals toMany relationships.
+func (space Space) SetToManyReferenceIDs(name string, IDs []string) error {
+	return nil
 }

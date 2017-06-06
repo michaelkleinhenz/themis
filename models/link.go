@@ -9,12 +9,12 @@ import (
 
 // Link is a link between two WorkItems.
 type Link struct {
-    ID                  bson.ObjectId       `bson:"_id,omitempty" jsonapi:"-"`
-    Version             int                 `bson:"version" jsonapi:"version"`
-		LinkTypeID	  			bson.ObjectId				`bson:"linktype" jsonapi:"-"`
-		SourceWorkItemID	  bson.ObjectId				`bson:"source_workitem" jsonapi:"-"`
-		TargetWorkItemID	 	bson.ObjectId				`bson:"target_workitem" jsonapi:"-"`
-    SpaceID             bson.ObjectId       `bson:"space_id" jsonapi:"-"`
+    ID                  bson.ObjectId       `bson:"_id,omitempty" json:"-"`
+    Version             int                 `bson:"version" json:"version"`
+		LinkTypeID	  			bson.ObjectId				`bson:"linktype" json:"-"`
+		SourceWorkItemID	  bson.ObjectId				`bson:"source_workitem" json:"-"`
+		TargetWorkItemID	 	bson.ObjectId				`bson:"target_workitem" json:"-"`
+    SpaceID             bson.ObjectId       `bson:"space_id" json:"-"`
     CreatedAt 	        time.Time    		    `bson:"created_at" json:"-"`
     UpdatedAt 	        time.Time		        `bson:"updated_at" json:"-"`
 }

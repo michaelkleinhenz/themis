@@ -9,22 +9,22 @@ import (
 
 // LinkType is a type for a link.
 type LinkType struct {
-    ID                  	bson.ObjectId       `bson:"_id,omitempty" jsonapi:"-"`
-    Name                	string              `bson:"name" jsonapi:"name"`
-    Description         	string              `bson:"description" jsonapi:"description"`
-    ForwardName         	string              `bson:"forward_name" jsonapi:"forward_name"`
-    ReverseName         	string              `bson:"reverse_name" jsonapi:"reverse_name"`
-    Topology            	string              `bson:"topology" jsonapi:"topology"`
-    Version             	int                 `bson:"version" jsonapi:"version"`
-		LinkCategoryID				bson.ObjectId				`bson:"link_category_id" jsonapi:"-"`
-		SourceWorkItemTypeID	bson.ObjectId				`bson:"source_workitemtype_id" jsonapi:"-"`
-		TargetWorkItemTypeID	bson.ObjectId				`bson:"target_workitemtype_id" jsonapi:"-"`
-		SpaceID             	bson.ObjectId       `bson:"space_id" jsonapi:"-"`
+    ID                  	bson.ObjectId       `bson:"_id,omitempty" json:"-"`
+    Name                	string              `bson:"name" json:"name"`
+    Description         	string              `bson:"description" json:"description"`
+    ForwardName         	string              `bson:"forward_name" json:"forward_name"`
+    ReverseName         	string              `bson:"reverse_name" json:"reverse_name"`
+    Topology            	string              `bson:"topology" json:"topology"`
+    Version             	int                 `bson:"version" json:"version"`
+		LinkCategoryID				bson.ObjectId				`bson:"link_category_id" json:"-"`
+		SourceWorkItemTypeID	bson.ObjectId				`bson:"source_workitemtype_id" json:"-"`
+		TargetWorkItemTypeID	bson.ObjectId				`bson:"target_workitemtype_id" json:"-"`
+		SpaceID             	bson.ObjectId       `bson:"space_id" json:"-"`
     CreatedAt 	        	time.Time  		    	`bson:"created_at" json:"-"`
     UpdatedAt 	        	time.Time		    		`bson:"updated_at" json:"-"`
-    CategoryRef           string              `bson:"-" jsonapi:"-"`
-    SourceWorkItemTypeRef string              `bson:"-" jsonapi:"-"`
-    TargetWorkItemTypeRef string              `bson:"-" jsonapi:"-"`
+    CategoryRef           string              `bson:"-" json:"-"`
+    SourceWorkItemTypeRef string              `bson:"-" json:"-"`
+    TargetWorkItemTypeRef string              `bson:"-" json:"-"`
 }
 
 // NewLinkType creates a new LinkType instance.

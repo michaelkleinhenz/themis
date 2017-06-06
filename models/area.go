@@ -9,13 +9,13 @@ import (
 
 // Area is a component of a space.
 type Area struct {
-    ID                  bson.ObjectId       `bson:"_id,omitempty" jsonapi:"-"`
-    Name                string              `bson:"name" jsonapi:"name"`
-    Description         string              `bson:"description" jsonapi:"description"`
-    ParentPath          string              `bson:"parent_path" jsonapi:"parent_path"`
-    ResolvedParentPath  string              `bson:"parent_path_resolved" jsonapi:"parent_path_resolved"`
-    ParentAreaID        bson.ObjectId       `bson:"parent_area_id,omitempty" jsonapi:"-"`
-    SpaceID             bson.ObjectId       `bson:"space_id" jsonapi:"-"`
+    ID                  bson.ObjectId       `bson:"_id,omitempty" json:"-"`
+    Name                string              `bson:"name" json:"name"`
+    Description         string              `bson:"description" json:"description"`
+    ParentPath          string              `bson:"parent_path" json:"parent_path"`
+    ResolvedParentPath  string              `bson:"parent_path_resolved" json:"parent_path_resolved"`
+    ParentAreaID        bson.ObjectId       `bson:"parent_area_id,omitempty" json:"-"`
+    SpaceID             bson.ObjectId       `bson:"space_id" json:"-"`
     CreatedAt 	        time.Time   		    `bson:"created_at" json:"-"`
     UpdatedAt 	        time.Time				    `bson:"updated_at" json:"-"`
 }

@@ -11,16 +11,16 @@ import (
 // WorkItem is a base entity for Themis.
 type WorkItem struct {
 	ID               bson.ObjectId     `bson:"_id,omitempty" json:"-"`
-	Attributes       map[string]string `bson:"attributes" jsonapi:"attr"`
-	SpaceID          bson.ObjectId     `bson:"space_id" jsonapi:"-"`
+	Attributes       map[string]string `bson:"attributes" json:"attr"`
+	SpaceID          bson.ObjectId     `bson:"space_id" json:"-"`
 	CreatedAt        time.Time         `bson:"created_at" json:"-"`
 	UpdatedAt        time.Time         `bson:"updated_at" json:"-"`
-	AreaID           bson.ObjectId     `bson:"area" jsonapi:"-"`
-	Assignees        []bson.ObjectId   `bson:"assignees,omitempty" jsonapi:"-"`
-	BaseTypeID       bson.ObjectId     `bson:"base_workitemtype_id" jsonapi:"-"`
-	ParentWorkItemID bson.ObjectId     `bson:"parent_workitem_id,omitempty" jsonapi:"-"`
-	CreatorID        bson.ObjectId     `bson:"creator_id" jsonapi:"-"`
-	IterationID      bson.ObjectId     `bson:"iteration_id" jsonapi:"-"`
+	AreaID           bson.ObjectId     `bson:"area" json:"-"`
+	Assignees        []bson.ObjectId   `bson:"assignees,omitempty" json:"-"`
+	BaseTypeID       bson.ObjectId     `bson:"base_workitemtype_id" json:"-"`
+	ParentWorkItemID bson.ObjectId     `bson:"parent_workitem_id,omitempty" json:"-"`
+	CreatorID        bson.ObjectId     `bson:"creator_id" json:"-"`
+	IterationID      bson.ObjectId     `bson:"iteration_id" json:"-"`
 }
 
 // NewWorkItem creates a new WorkItem instance.

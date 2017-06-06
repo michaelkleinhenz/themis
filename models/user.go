@@ -9,12 +9,12 @@ import (
 
 // User is a user in the system.
 type User struct {
-    ID        bson.ObjectId		`bson:"_id,omitempty" jsonapi:"-"`
-    FullName  string          `bson:"full_name" jsonapi:"fullName"`
-    ImageURL  string          `bson:"image_url" jsonapi:"imageUrl"`
-    Username	string          `bson:"username" jsonapi:"username"`
-    CreatedAt time.Time 	    `bson:"created_at" jsonapi:"-"`
-    UpdatedAt time.Time	      `bson:"updated_at" jsonapi:"-"`
+    ID        bson.ObjectId		`bson:"_id,omitempty" json:"-"`
+    FullName  string          `bson:"full_name" json:"fullName"`
+    ImageURL  string          `bson:"image_url" json:"imageUrl"`
+    Username	string          `bson:"username" json:"username"`
+    CreatedAt time.Time 	    `bson:"created_at" json:"-"`
+    UpdatedAt time.Time	      `bson:"updated_at" json:"-"`
 }
 
 // NewUser creates a new User instance.

@@ -13,18 +13,18 @@ import (
 
 // Iteration is a time-boxed group of WorkItems.
 type Iteration struct {
-	ID                 bson.ObjectId `bson:"_id,omitempty" jsonapi:"-"`
-	EndAt              time.Time     `bson:"end_at" jsonapi:"endAt"`
-	StartAt            time.Time     `bson:"start_at" jsonapi:"startAt"`
-	Name               string        `bson:"name" jsonapi:"name"`
-	State              string        `bson:"state" jsonapi:"state"`
-	Description        string        `bson:"description" jsonapi:"description"`
-	ParentPath         string        `bson:"parent_path" jsonapi:"parent_path"`
-	ResolvedParentPath string        `bson:"parent_path_resolved" jsonapi:"parent_path_resolved"`
-	CreatedAt          time.Time     `bson:"created_at" jsonapi:"created-at"`
-	UpdatedAt          time.Time     `bson:"updated_at" jsonapi:"-"`
-	ParentIterationID  bson.ObjectId `bson:"parent_iteration_id,omitempty" jsonapi:"-"`
-	SpaceID            bson.ObjectId `bson:"space_id" jsonapi:"-"`
+	ID                 bson.ObjectId `bson:"_id,omitempty" json:"-"`
+	EndAt              time.Time     `bson:"end_at" json:"endAt"`
+	StartAt            time.Time     `bson:"start_at" json:"startAt"`
+	Name               string        `bson:"name" json:"name"`
+	State              string        `bson:"state" json:"state"`
+	Description        string        `bson:"description" json:"description"`
+	ParentPath         string        `bson:"parent_path" json:"parent_path"`
+	ResolvedParentPath string        `bson:"parent_path_resolved" json:"parent_path_resolved"`
+	CreatedAt          time.Time     `bson:"created_at" json:"created-at"`
+	UpdatedAt          time.Time     `bson:"updated_at" json:"-"`
+	ParentIterationID  bson.ObjectId `bson:"parent_iteration_id,omitempty" json:"-"`
+	SpaceID            bson.ObjectId `bson:"space_id" json:"-"`
 }
 
 // NewIteration creates a new Iteration instance.

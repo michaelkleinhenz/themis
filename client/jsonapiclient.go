@@ -76,7 +76,7 @@ func doDELETE(url string) ([]byte, error) {
 
 // GetSpace retrieves a space from a given API URL for a given SpaceID.
 func GetSpace(apiURL string, spaceID string) (*models.Space, map[string]interface{}, error) {
-	result, err := doGETRequest(apiURL + "/spaces/" + spaceID)
+	result, err := doGETRequest(apiURL + "/api/spaces/" + spaceID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -96,7 +96,7 @@ func GetSpace(apiURL string, spaceID string) (*models.Space, map[string]interfac
 
 // GetWorkItem retrieves a space from a given API URL for a given SpaceID.
 func GetWorkItem(apiURL string, spaceID string, workItemID string) (*models.WorkItem, map[string]interface{}, error) {
-	result, err := doGETRequest(apiURL + "/spaces/" + spaceID + "/workitems/" + workItemID)
+	result, err := doGETRequest(apiURL + "/api/spaces/" + spaceID + "/workitems/" + workItemID)
 	if err != nil {
 		return nil, nil, err
 	}
