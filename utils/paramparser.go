@@ -12,7 +12,28 @@ func BuildDbFilterFromRequest(r api2go.Request) interface{} {
 	var filter interface{}
 	spaceID, ok := getPathParam(r, "spacesID")
 	if ok {
-		filter = bson.M{"space": bson.ObjectIdHex(spaceID)}
+		filter = bson.M{"space_id": bson.ObjectIdHex(spaceID)}
+	} 
+	workitemID, ok := getPathParam(r, "workitemID")
+	if ok {
+		if filter == nil {
+			filter = bson.M{}
+		}
+		(filter.(bson.M))["workitem_id"] = workitemID
+	} 
+	iterationsID, ok := getPathParam(r, "iterationsID")
+	if ok {
+		if filter == nil {
+			filter = bson.M{}
+		}
+		(filter.(bson.M))["iteration_id"] = iterationsID
+	} 
+	areasID, ok := getPathParam(r, "areasID")
+	if ok {
+		if filter == nil {
+			filter = bson.M{}
+		}
+		(filter.(bson.M))["area_id"] = areasID
 	} 
 	return filter
 }

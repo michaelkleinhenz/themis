@@ -46,9 +46,10 @@ func main() {
 	r := gin.Default()
 	api := api2go.NewAPIWithRouting(
 		"api",
-		api2go.NewStaticResolver("/"),
+		api2go.NewStaticResolver(configuration.ServiceURL),
 		gingonic.New(r),
 	)
+
 	r.StaticFile("/", "./static/index.html")
 	api.AddResource(models.Space{}, resources.SpaceResource{SpaceStorage: storageBackends.Space})
 	api.AddResource(models.WorkItem{}, resources.WorkItemResource{WorkItemStorage: storageBackends.WorkItem})

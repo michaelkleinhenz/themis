@@ -8,6 +8,7 @@ const ModeProduction = "production"
 const ModeDevelopment = "development"
 
 type Configuration struct {
+		ServiceURL string
     ServicePort string
 		ServiceMode string
     DatabaseHost  string
@@ -27,6 +28,7 @@ func Load() Configuration {
 	if err != nil {
 		ErrorLog.Println("Config file not found..")
 	} else {
+		configuration.ServiceURL = viper.GetString("service.url")
 		configuration.ServicePort = viper.GetString("service.port")
 		configuration.ServiceMode = viper.GetString("service.mode")
 

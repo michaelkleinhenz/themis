@@ -12,7 +12,7 @@ type Comment struct {
     ID                  bson.ObjectId       `bson:"_id,omitempty" jsonapi:"-"`
     Content             string              `bson:"content" jsonapi:"body"`
     CreatedAt           time.Time           `bson:"created_at" jsonapi:"created-at"`
-    UpdatedAt 	        time.Time    	    `bson:"updated_at" jsonapi:"-"`
+    UpdatedAt 	        time.Time    	      `bson:"updated_at" jsonapi:"-"`
     CreatorID           bson.ObjectId       `bson:"creator_id" jsonapi:"-"`
     WorkItemID          bson.ObjectId       `bson:"workitem_id" jsonapi:"-"`
 }

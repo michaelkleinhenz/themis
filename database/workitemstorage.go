@@ -97,7 +97,7 @@ func (workItemStorage *WorkItemStorage) GetAll(queryExpression interface{}) ([]m
     utils.ErrorLog.Printf("Error while retrieving all WorkItems from database: %s", err.Error())
     return nil, err
 	}
-  utils.DebugLog.Printf("Retrieved all WorkItems from database.")  
+  utils.DebugLog.Printf("Retrieved WorkItems from database for criteria %s.", queryExpression)
   return *allWorkItems, nil
 }
 

@@ -112,9 +112,9 @@ func (SpaceStorage *SpaceStorage) GetAllPaged(queryExpression interface{}, offse
 }
 
 // GetAllCount returns the number of elements in the database.
-func (SpaceStorage *SpaceStorage) GetAllCount() (int, error) {
+func (SpaceStorage *SpaceStorage) GetAllCount(queryExpression interface{}) (int, error) {
 	coll := SpaceStorage.database.C("spaces")
-  allCount, err := coll.Find(nil).Count()
+  allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of Spaces from database: %s", err.Error())
     return -1, err
