@@ -84,10 +84,10 @@ func (LinkTypeStorage *LinkTypeStorage) GetOne(id bson.ObjectId) (models.LinkTyp
 }
 
 // GetAll returns an entity from the database based on a given ID.
-func (LinkTypeStorage *LinkTypeStorage) GetAll() ([]models.LinkType, error) {
+func (LinkTypeStorage *LinkTypeStorage) GetAll(queryExpression interface{}) ([]models.LinkType, error) {
 	allLinkTypes := new([]models.LinkType)
 	coll := LinkTypeStorage.database.C("linkTypes")
-	if err := coll.Find(nil).All(allLinkTypes); err != nil {
+	if err := coll.Find(queryExpression).All(allLinkTypes); err != nil {
 		utils.ErrorLog.Printf("Error while retrieving all LinkTypes from database: %s", err.Error())
 		return nil, err
 	}
@@ -96,12 +96,12 @@ func (LinkTypeStorage *LinkTypeStorage) GetAll() ([]models.LinkType, error) {
 }
 
 // GetAllPaged returns a subset based on offset and limit.
-func (LinkTypeStorage *LinkTypeStorage) GetAllPaged(offset int, limit int) ([]models.LinkType, error) {
+func (LinkTypeStorage *LinkTypeStorage) GetAllPaged(queryExpression interface{}, offset int, limit int) ([]models.LinkType, error) {
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allLinkTypes := new([]models.LinkType)
 	coll := LinkTypeStorage.database.C("linkTypes")
-  query := coll.Find(nil).Sort("updated_at").Limit(limit)
+  query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allLinkTypes); err != nil { 
     utils.ErrorLog.Printf("Error while retrieving paged LinkTypes from database: %s", err.Error())
@@ -112,9 +112,9 @@ func (LinkTypeStorage *LinkTypeStorage) GetAllPaged(offset int, limit int) ([]mo
 }
 
 // GetAllCount returns the number of elements in the database.
-func (LinkTypeStorage *LinkTypeStorage) GetAllCount() (int, error) {
+func (LinkTypeStorage *LinkTypeStorage) GetAllCount(queryExpression interface{}) (int, error) {
 	coll := LinkTypeStorage.database.C("linkTypes")
-  allCount, err := coll.Find(nil).Count()
+  allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of LinkTypes from database: %s", err.Error())
     return -1, err

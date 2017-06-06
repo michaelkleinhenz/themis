@@ -19,7 +19,7 @@ type AreaResource struct {
 
 // FindAll Areas.
 func (c AreaResource) FindAll(r api2go.Request) (api2go.Responder, error) {
-	areas, _ := c.AreaStorage.GetAll()
+	areas, _ := c.AreaStorage.GetAll(nil)
 	return &api2go.Response{Res: areas}, nil
 }
 
@@ -34,13 +34,13 @@ func (c AreaResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Responder
 	}
 
 	// get the paged data from storage
-	result, err := c.AreaStorage.GetAllPaged(queryOffset, queryLimit)
+	result, err := c.AreaStorage.GetAllPaged(nil, queryOffset, queryLimit)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}
 
 	// get total count for paging
-	allCount, err := c.AreaStorage.GetAllCount()
+	allCount, err := c.AreaStorage.GetAllCount(nil)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}

@@ -85,11 +85,15 @@ func (workItemStorage *WorkItemStorage) GetOne(id bson.ObjectId) (models.WorkIte
   return *wItem, nil
 }
 
-// GetAll returns an entity from the database based on a given ID.
-func (workItemStorage *WorkItemStorage) GetAll() ([]models.WorkItem, error) {
+// GetAll returns an entity from the database based on a given ID. The queryExpression is a Mongo 
+// compliant search expression, either a Map or a Struct that can be serialized by bson. See 
+// https://docs.mongodb.com/manual/tutorial/query-documents/ for details on what can be expressed
+// in a query. The keys used are the bson keys used on the model structs. Example:
+// `bson.M{"space": spaceID}`.
+func (workItemStorage *WorkItemStorage) GetAll(queryExpression interface{}) ([]models.WorkItem, error) {
   allWorkItems := new([]models.WorkItem)
 	coll := workItemStorage.database.C("workitems")
-  if err := coll.Find(nil).All(allWorkItems); err != nil { 
+  if err := coll.Find(queryExpression).All(allWorkItems); err != nil { 
     utils.ErrorLog.Printf("Error while retrieving all WorkItems from database: %s", err.Error())
     return nil, err
 	}
@@ -98,12 +102,12 @@ func (workItemStorage *WorkItemStorage) GetAll() ([]models.WorkItem, error) {
 }
 
 // GetAllPaged returns a subset of the work items based on offset and limit.
-func (workItemStorage *WorkItemStorage) GetAllPaged(offset int, limit int) ([]models.WorkItem, error) {
+func (workItemStorage *WorkItemStorage) GetAllPaged(queryExpression interface{}, offset int, limit int) ([]models.WorkItem, error) {
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allWorkItems := new([]models.WorkItem)
 	coll := workItemStorage.database.C("workitems")
-  query := coll.Find(nil).Sort("updated_at").Limit(limit)
+  query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allWorkItems); err != nil { 
     utils.ErrorLog.Printf("Error while retrieving paged WorkItems from database: %s", err.Error())
@@ -114,25 +118,12 @@ func (workItemStorage *WorkItemStorage) GetAllPaged(offset int, limit int) ([]mo
 }
 
 // GetAllCount returns the number of elements in the database.
-func (workItemStorage *WorkItemStorage) GetAllCount() (int, error) {
+func (workItemStorage *WorkItemStorage) GetAllCount(queryExpression interface{}) (int, error) {
 	coll := workItemStorage.database.C("workitems")
-  allCount, err := coll.Find(nil).Count()
+  allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of WorkItems from database: %s", err.Error())
     return -1, err
 	}
   return allCount, nil  
-}
-
-// GetBySpaceID returns all workitems for a given space id.
-func (workItemStorage *WorkItemStorage) GetBySpaceID(spaceID bson.ObjectId) ([]models.WorkItem, error) {
-	utils.DebugLog.Printf("Received GetBySpaceID with ID %s.", spaceID.Hex())
-  allWorkItems := new([]models.WorkItem)
-	coll := workItemStorage.database.C("workitems")
-  if err := coll.Find(bson.M{"space": spaceID}).All(allWorkItems); err != nil { 
-    utils.ErrorLog.Printf("Error while retrieving all WorkItems from database: %s", err.Error())
-    return nil, err
-	}
-  utils.DebugLog.Printf("Retrieved all WorkItems from database.")  
-  return *allWorkItems, nil
 }

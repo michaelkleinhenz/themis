@@ -84,10 +84,10 @@ func (LinkCategoryStorage *LinkCategoryStorage) GetOne(id bson.ObjectId) (models
 }
 
 // GetAll returns an entity from the database based on a given ID.
-func (LinkCategoryStorage *LinkCategoryStorage) GetAll() ([]models.LinkCategory, error) {
+func (LinkCategoryStorage *LinkCategoryStorage) GetAll(queryExpression interface{}) ([]models.LinkCategory, error) {
 	allLinkCategorys := new([]models.LinkCategory)
 	coll := LinkCategoryStorage.database.C("linkCategorys")
-	if err := coll.Find(nil).All(allLinkCategorys); err != nil {
+	if err := coll.Find(queryExpression).All(allLinkCategorys); err != nil {
 		utils.ErrorLog.Printf("Error while retrieving all LinkCategorys from database: %s", err.Error())
 		return nil, err
 	}
@@ -96,12 +96,12 @@ func (LinkCategoryStorage *LinkCategoryStorage) GetAll() ([]models.LinkCategory,
 }
 
 // GetAllPaged returns a subset based on offset and limit.
-func (LinkCategoryStorage *LinkCategoryStorage) GetAllPaged(offset int, limit int) ([]models.LinkCategory, error) {
+func (LinkCategoryStorage *LinkCategoryStorage) GetAllPaged(queryExpression interface{}, offset int, limit int) ([]models.LinkCategory, error) {
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allLinkCategorys := new([]models.LinkCategory)
 	coll := LinkCategoryStorage.database.C("linkCategorys")
-  query := coll.Find(nil).Sort("updated_at").Limit(limit)
+  query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allLinkCategorys); err != nil { 
     utils.ErrorLog.Printf("Error while retrieving paged LinkCategorys from database: %s", err.Error())
@@ -112,9 +112,9 @@ func (LinkCategoryStorage *LinkCategoryStorage) GetAllPaged(offset int, limit in
 }
 
 // GetAllCount returns the number of elements in the database.
-func (LinkCategoryStorage *LinkCategoryStorage) GetAllCount() (int, error) {
+func (LinkCategoryStorage *LinkCategoryStorage) GetAllCount(queryExpression interface{}) (int, error) {
 	coll := LinkCategoryStorage.database.C("linkCategorys")
-  allCount, err := coll.Find(nil).Count()
+  allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of LinkCategorys from database: %s", err.Error())
     return -1, err

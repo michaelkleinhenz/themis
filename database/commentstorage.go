@@ -84,10 +84,10 @@ func (CommentStorage *CommentStorage) GetOne(id bson.ObjectId) (models.Comment, 
 }
 
 // GetAll returns an entity from the database based on a given ID.
-func (CommentStorage *CommentStorage) GetAll() ([]models.Comment, error) {
+func (CommentStorage *CommentStorage) GetAll(queryExpression interface{}) ([]models.Comment, error) {
 	allComments := new([]models.Comment)
 	coll := CommentStorage.database.C("comments")
-	if err := coll.Find(nil).All(allComments); err != nil {
+	if err := coll.Find(queryExpression).All(allComments); err != nil {
 		utils.ErrorLog.Printf("Error while retrieving all Comments from database: %s", err.Error())
 		return nil, err
 	}
@@ -96,12 +96,12 @@ func (CommentStorage *CommentStorage) GetAll() ([]models.Comment, error) {
 }
 
 // GetAllPaged returns a subset based on offset and limit.
-func (CommentStorage *CommentStorage) GetAllPaged(offset int, limit int) ([]models.Comment, error) {
+func (CommentStorage *CommentStorage) GetAllPaged(queryExpression interface{}, offset int, limit int) ([]models.Comment, error) {
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allComments := new([]models.Comment)
 	coll := CommentStorage.database.C("Comments")
-  query := coll.Find(nil).Sort("updated_at").Limit(limit)
+  query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allComments); err != nil { 
     utils.ErrorLog.Printf("Error while retrieving paged Comments from database: %s", err.Error())
@@ -112,9 +112,9 @@ func (CommentStorage *CommentStorage) GetAllPaged(offset int, limit int) ([]mode
 }
 
 // GetAllCount returns the number of elements in the database.
-func (CommentStorage *CommentStorage) GetAllCount() (int, error) {
+func (CommentStorage *CommentStorage) GetAllCount(queryExpression interface{}) (int, error) {
 	coll := CommentStorage.database.C("comments")
-  allCount, err := coll.Find(nil).Count()
+  allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of Comments from database: %s", err.Error())
     return -1, err

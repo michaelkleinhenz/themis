@@ -84,10 +84,10 @@ func (UserStorage *UserStorage) GetOne(id bson.ObjectId) (models.User, error) {
 }
 
 // GetAll returns an entity from the database based on a given ID.
-func (UserStorage *UserStorage) GetAll() ([]models.User, error) {
+func (UserStorage *UserStorage) GetAll(queryExpression interface{}) ([]models.User, error) {
 	allUsers := new([]models.User)
 	coll := UserStorage.database.C("users")
-	if err := coll.Find(nil).All(allUsers); err != nil {
+	if err := coll.Find(queryExpression).All(allUsers); err != nil {
 		utils.ErrorLog.Printf("Error while retrieving all Users from database: %s", err.Error())
 		return nil, err
 	}
@@ -96,12 +96,12 @@ func (UserStorage *UserStorage) GetAll() ([]models.User, error) {
 }
 
 // GetAllPaged returns a subset based on offset and limit.
-func (UserStorage *UserStorage) GetAllPaged(offset int, limit int) ([]models.User, error) {
+func (UserStorage *UserStorage) GetAllPaged(queryExpression interface{}, offset int, limit int) ([]models.User, error) {
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allUsers := new([]models.User)
 	coll := UserStorage.database.C("users")
-  query := coll.Find(nil).Sort("updated_at").Limit(limit)
+  query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allUsers); err != nil { 
     utils.ErrorLog.Printf("Error while retrieving paged Users from database: %s", err.Error())
@@ -112,9 +112,9 @@ func (UserStorage *UserStorage) GetAllPaged(offset int, limit int) ([]models.Use
 }
 
 // GetAllCount returns the number of elements in the database.
-func (UserStorage *UserStorage) GetAllCount() (int, error) {
+func (UserStorage *UserStorage) GetAllCount(queryExpression interface{}) (int, error) {
 	coll := UserStorage.database.C("users")
-  allCount, err := coll.Find(nil).Count()
+  allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of Users from database: %s", err.Error())
     return -1, err

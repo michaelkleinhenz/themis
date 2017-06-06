@@ -84,10 +84,10 @@ func (LinkStorage *LinkStorage) GetOne(id bson.ObjectId) (models.Link, error) {
 }
 
 // GetAll returns an entity from the database based on a given ID.
-func (LinkStorage *LinkStorage) GetAll() ([]models.Link, error) {
+func (LinkStorage *LinkStorage) GetAll(queryExpression interface{}) ([]models.Link, error) {
 	allLinks := new([]models.Link)
 	coll := LinkStorage.database.C("links")
-	if err := coll.Find(nil).All(allLinks); err != nil {
+	if err := coll.Find(queryExpression).All(allLinks); err != nil {
 		utils.ErrorLog.Printf("Error while retrieving all Links from database: %s", err.Error())
 		return nil, err
 	}
@@ -96,12 +96,12 @@ func (LinkStorage *LinkStorage) GetAll() ([]models.Link, error) {
 }
 
 // GetAllPaged returns a subset based on offset and limit.
-func (LinkStorage *LinkStorage) GetAllPaged(offset int, limit int) ([]models.Link, error) {
+func (LinkStorage *LinkStorage) GetAllPaged(queryExpression interface{}, offset int, limit int) ([]models.Link, error) {
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allLinks := new([]models.Link)
 	coll := LinkStorage.database.C("links")
-  query := coll.Find(nil).Sort("updated_at").Limit(limit)
+  query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allLinks); err != nil { 
     utils.ErrorLog.Printf("Error while retrieving paged Links from database: %s", err.Error())
@@ -112,9 +112,9 @@ func (LinkStorage *LinkStorage) GetAllPaged(offset int, limit int) ([]models.Lin
 }
 
 // GetAllCount returns the number of elements in the database.
-func (LinkStorage *LinkStorage) GetAllCount() (int, error) {
+func (LinkStorage *LinkStorage) GetAllCount(queryExpression interface{}) (int, error) {
 	coll := LinkStorage.database.C("links")
-  allCount, err := coll.Find(nil).Count()
+  allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of Links from database: %s", err.Error())
     return -1, err

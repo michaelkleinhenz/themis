@@ -19,7 +19,7 @@ type IterationResource struct {
 
 // FindAll Iterations.
 func (c IterationResource) FindAll(r api2go.Request) (api2go.Responder, error) {
-	iterations, _ := c.IterationStorage.GetAll()
+	iterations, _ := c.IterationStorage.GetAll(nil)
 	return &api2go.Response{Res: iterations}, nil
 }
 
@@ -34,13 +34,13 @@ func (c IterationResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Resp
 	}
 
 	// get the paged data from storage
-	result, err := c.IterationStorage.GetAllPaged(queryOffset, queryLimit)
+	result, err := c.IterationStorage.GetAllPaged(nil, queryOffset, queryLimit)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}
 
 	// get total count for paging
-	allCount, err := c.IterationStorage.GetAllCount()
+	allCount, err := c.IterationStorage.GetAllCount(nil)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}

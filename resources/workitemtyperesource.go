@@ -19,7 +19,7 @@ type WorkItemTypeResource struct {
 
 // FindAll WorkItemTypes.
 func (c WorkItemTypeResource) FindAll(r api2go.Request) (api2go.Responder, error) {
-	workItemTypes, _ := c.WorkItemTypeStorage.GetAll()
+	workItemTypes, _ := c.WorkItemTypeStorage.GetAll(nil)
 	return &api2go.Response{Res: workItemTypes}, nil
 }
 
@@ -34,13 +34,13 @@ func (c WorkItemTypeResource) PaginatedFindAll(r api2go.Request) (uint, api2go.R
 	}
 
 	// get the paged data from storage
-	result, err := c.WorkItemTypeStorage.GetAllPaged(queryOffset, queryLimit)
+	result, err := c.WorkItemTypeStorage.GetAllPaged(nil, queryOffset, queryLimit)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}
 
 	// get total count for paging
-	allCount, err := c.WorkItemTypeStorage.GetAllCount()
+	allCount, err := c.WorkItemTypeStorage.GetAllCount(nil)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}

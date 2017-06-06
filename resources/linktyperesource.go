@@ -19,7 +19,7 @@ type LinkTypeResource struct {
 
 // FindAll LinkTypes.
 func (c LinkTypeResource) FindAll(r api2go.Request) (api2go.Responder, error) {
-	linkTypes, _ := c.LinkTypeStorage.GetAll()
+	linkTypes, _ := c.LinkTypeStorage.GetAll(nil)
 	return &api2go.Response{Res: linkTypes}, nil
 }
 
@@ -34,13 +34,13 @@ func (c LinkTypeResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Respo
 	}
 
 	// get the paged data from storage
-	result, err := c.LinkTypeStorage.GetAllPaged(queryOffset, queryLimit)
+	result, err := c.LinkTypeStorage.GetAllPaged(nil, queryOffset, queryLimit)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}
 
 	// get total count for paging
-	allCount, err := c.LinkTypeStorage.GetAllCount()
+	allCount, err := c.LinkTypeStorage.GetAllCount(nil)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}

@@ -19,7 +19,7 @@ type SpaceResource struct {
 
 // FindAll Spaces.
 func (c SpaceResource) FindAll(r api2go.Request) (api2go.Responder, error) {
-	spaces, _ := c.SpaceStorage.GetAll()
+	spaces, _ := c.SpaceStorage.GetAll(nil)
 	return &api2go.Response{Res: spaces}, nil
 }
 
@@ -34,13 +34,13 @@ func (c SpaceResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Responde
 	}
 
 	// get the paged data from storage
-	result, err := c.SpaceStorage.GetAllPaged(queryOffset, queryLimit)
+	result, err := c.SpaceStorage.GetAllPaged(nil, queryOffset, queryLimit)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}
 
 	// get total count for paging
-	allCount, err := c.SpaceStorage.GetAllCount()
+	allCount, err := c.SpaceStorage.GetAllCount(nil)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}

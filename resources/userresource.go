@@ -19,7 +19,7 @@ type UserResource struct {
 
 // FindAll Users.
 func (c UserResource) FindAll(r api2go.Request) (api2go.Responder, error) {
-	users, _ := c.UserStorage.GetAll()
+	users, _ := c.UserStorage.GetAll(nil)
 	return &api2go.Response{Res: users}, nil
 }
 
@@ -34,13 +34,13 @@ func (c UserResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Responder
 	}
 
 	// get the paged data from storage
-	result, err := c.UserStorage.GetAllPaged(queryOffset, queryLimit)
+	result, err := c.UserStorage.GetAllPaged(nil, queryOffset, queryLimit)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}
 
 	// get total count for paging
-	allCount, err := c.UserStorage.GetAllCount()
+	allCount, err := c.UserStorage.GetAllCount(nil)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}

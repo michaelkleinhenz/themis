@@ -84,10 +84,10 @@ func (IterationStorage *IterationStorage) GetOne(id bson.ObjectId) (models.Itera
 }
 
 // GetAll returns an entity from the database based on a given ID.
-func (IterationStorage *IterationStorage) GetAll() ([]models.Iteration, error) {
+func (IterationStorage *IterationStorage) GetAll(queryExpression interface{}) ([]models.Iteration, error) {
 	allIterations := new([]models.Iteration)
 	coll := IterationStorage.database.C("iterations")
-	if err := coll.Find(nil).All(allIterations); err != nil {
+	if err := coll.Find(queryExpression).All(allIterations); err != nil {
 		utils.ErrorLog.Printf("Error while retrieving all Iterations from database: %s", err.Error())
 		return nil, err
 	}
@@ -96,12 +96,12 @@ func (IterationStorage *IterationStorage) GetAll() ([]models.Iteration, error) {
 }
 
 // GetAllPaged returns a subset based on offset and limit.
-func (IterationStorage *IterationStorage) GetAllPaged(offset int, limit int) ([]models.Iteration, error) {
+func (IterationStorage *IterationStorage) GetAllPaged(queryExpression interface{}, offset int, limit int) ([]models.Iteration, error) {
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allIterations := new([]models.Iteration)
 	coll := IterationStorage.database.C("iterations")
-  query := coll.Find(nil).Sort("updated_at").Limit(limit)
+  query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allIterations); err != nil { 
     utils.ErrorLog.Printf("Error while retrieving paged Iterations from database: %s", err.Error())
@@ -112,9 +112,9 @@ func (IterationStorage *IterationStorage) GetAllPaged(offset int, limit int) ([]
 }
 
 // GetAllCount returns the number of elements in the database.
-func (IterationStorage *IterationStorage) GetAllCount() (int, error) {
+func (IterationStorage *IterationStorage) GetAllCount(queryExpression interface{}) (int, error) {
 	coll := IterationStorage.database.C("iterations")
-  allCount, err := coll.Find(nil).Count()
+  allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of Iterations from database: %s", err.Error())
     return -1, err

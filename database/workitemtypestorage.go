@@ -84,10 +84,10 @@ func (WorkItemTypeStorage *WorkItemTypeStorage) GetOne(id bson.ObjectId) (models
 }
 
 // GetAll returns an entity from the database based on a given ID.
-func (WorkItemTypeStorage *WorkItemTypeStorage) GetAll() ([]models.WorkItemType, error) {
+func (WorkItemTypeStorage *WorkItemTypeStorage) GetAll(queryExpression interface{}) ([]models.WorkItemType, error) {
 	allWorkItemTypes := new([]models.WorkItemType)
 	coll := WorkItemTypeStorage.database.C("workitemtypes")
-	if err := coll.Find(nil).All(allWorkItemTypes); err != nil {
+	if err := coll.Find(queryExpression).All(allWorkItemTypes); err != nil {
 		utils.ErrorLog.Printf("Error while retrieving all WorkItemTypes from database: %s", err.Error())
 		return nil, err
 	}
@@ -96,12 +96,12 @@ func (WorkItemTypeStorage *WorkItemTypeStorage) GetAll() ([]models.WorkItemType,
 }
 
 // GetAllPaged returns a subset based on offset and limit.
-func (WorkItemTypeStorage *WorkItemTypeStorage) GetAllPaged(offset int, limit int) ([]models.WorkItemType, error) {
+func (WorkItemTypeStorage *WorkItemTypeStorage) GetAllPaged(queryExpression interface{}, offset int, limit int) ([]models.WorkItemType, error) {
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allWorkItemTypes := new([]models.WorkItemType)
 	coll := WorkItemTypeStorage.database.C("workitemtypes")
-  query := coll.Find(nil).Sort("updated_at").Limit(limit)
+  query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allWorkItemTypes); err != nil { 
     utils.ErrorLog.Printf("Error while retrieving paged WorkItemTypes from database: %s", err.Error())
@@ -112,9 +112,9 @@ func (WorkItemTypeStorage *WorkItemTypeStorage) GetAllPaged(offset int, limit in
 }
 
 // GetAllCount returns the number of elements in the database.
-func (WorkItemTypeStorage *WorkItemTypeStorage) GetAllCount() (int, error) {
+func (WorkItemTypeStorage *WorkItemTypeStorage) GetAllCount(queryExpression interface{}) (int, error) {
 	coll := WorkItemTypeStorage.database.C("workitemtypes")
-  allCount, err := coll.Find(nil).Count()
+  allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of WorkItemTypes from database: %s", err.Error())
     return -1, err

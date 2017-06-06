@@ -84,10 +84,10 @@ func (AreaStorage *AreaStorage) GetOne(id bson.ObjectId) (models.Area, error) {
 }
 
 // GetAll returns an entity from the database based on a given ID.
-func (AreaStorage *AreaStorage) GetAll() ([]models.Area, error) {
+func (AreaStorage *AreaStorage) GetAll(queryExpression interface{}) ([]models.Area, error) {
 	allAreas := new([]models.Area)
 	coll := AreaStorage.database.C("areas")
-	if err := coll.Find(nil).All(allAreas); err != nil {
+	if err := coll.Find(queryExpression).All(allAreas); err != nil {
 		utils.ErrorLog.Printf("Error while retrieving all Areas from database: %s", err.Error())
 		return nil, err
 	}
@@ -96,12 +96,12 @@ func (AreaStorage *AreaStorage) GetAll() ([]models.Area, error) {
 }
 
 // GetAllPaged returns a subset based on offset and limit.
-func (AreaStorage *AreaStorage) GetAllPaged(offset int, limit int) ([]models.Area, error) {
+func (AreaStorage *AreaStorage) GetAllPaged(queryExpression interface{}, offset int, limit int) ([]models.Area, error) {
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allAreas := new([]models.Area)
 	coll := AreaStorage.database.C("areas")
-  query := coll.Find(nil).Sort("updated_at").Limit(limit)
+  query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allAreas); err != nil { 
     utils.ErrorLog.Printf("Error while retrieving paged Areas from database: %s", err.Error())
@@ -112,9 +112,9 @@ func (AreaStorage *AreaStorage) GetAllPaged(offset int, limit int) ([]models.Are
 }
 
 // GetAllCount returns the number of elements in the database.
-func (AreaStorage *AreaStorage) GetAllCount() (int, error) {
+func (AreaStorage *AreaStorage) GetAllCount(queryExpression interface{}) (int, error) {
 	coll := AreaStorage.database.C("areas")
-  allCount, err := coll.Find(nil).Count()
+  allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of Areas from database: %s", err.Error())
     return -1, err

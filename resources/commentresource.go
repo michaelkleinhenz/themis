@@ -19,7 +19,7 @@ type CommentResource struct {
 
 // FindAll Comments.
 func (c CommentResource) FindAll(r api2go.Request) (api2go.Responder, error) {
-	comments, _ := c.CommentStorage.GetAll()
+	comments, _ := c.CommentStorage.GetAll(nil)
 	return &api2go.Response{Res: comments}, nil
 }
 
@@ -34,13 +34,13 @@ func (c CommentResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Respon
 	}
 
 	// get the paged data from storage
-	result, err := c.CommentStorage.GetAllPaged(queryOffset, queryLimit)
+	result, err := c.CommentStorage.GetAllPaged(nil, queryOffset, queryLimit)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}
 
 	// get total count for paging
-	allCount, err := c.CommentStorage.GetAllCount()
+	allCount, err := c.CommentStorage.GetAllCount(nil)
 	if err!=nil {
 		return 0, &api2go.Response{}, err
 	}
