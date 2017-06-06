@@ -6,6 +6,7 @@
 debug
 themis
 *.log
+*.coverprofile
 
 # Test binary, build with `go test -c`
 *.test
