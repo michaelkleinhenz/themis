@@ -7,28 +7,17 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-func GetPathID(r api2go.Request, typeStr string) (string, bool) {
-	spacesID, ok := r.QueryParams[typeStr]
-	if ok {
-		spaceID := spacesID[0]
-		return spaceID, true
-	}
-	return "", false
-}
-
+// BuildDbFilterFromRequest builds the filter structure from the request.
 func BuildDbFilterFromRequest(r api2go.Request) interface{} {
 	var filter interface{}
-	spaceID, ok := GetSpaceID(r)
+	spaceID, ok := getPathParam(r, "spacesID")
 	if ok {
 		filter = bson.M{"space": bson.ObjectIdHex(spaceID)}
 	} 
 	return filter
 }
 
-func GetSpaceID(r api2go.Request) (string, bool) {
-	return GetPathID(r, "spacesID")
-}
-
+// ParsePaging parses the paging parameters of a request and returns them in a normalized version (start, limit).
 func ParsePaging(r api2go.Request) (int, int, error) {
 	var number, size, offset, limit	string
 
@@ -78,4 +67,13 @@ func ParsePaging(r api2go.Request) (int, int, error) {
 	}
 
 	return resultStart, resultLimit, nil
+}
+
+func getPathParam(r api2go.Request, typeStr string) (string, bool) {
+	spacesID, ok := r.QueryParams[typeStr]
+	if ok {
+		spaceID := spacesID[0]
+		return spaceID, true
+	}
+	return "", false
 }
