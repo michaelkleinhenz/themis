@@ -21,20 +21,17 @@ type WorkItemResource struct {
 func (c WorkItemResource) FindAll(r api2go.Request) (api2go.Responder, error) {
 	utils.DebugLog.Printf("Received FindAll with params %s.", r.QueryParams)
 	// we only want workitems on a space
-	spacesID, ok := r.QueryParams["spacesID"]
+	spaceID, ok := utils.GetSpaceID(r)
 	if ok {
-		// this means that we want to show all workItems of a space, this is the route
-		// /api/spaces/xyz/workitems
-		spacesID := spacesID[0]
-		// filter out workItems with spaceID, in real world, you would just run a different database query
-		workItems, err := c.WorkItemStorage.GetBySpaceID(bson.ObjectIdHex(spacesID))
+		// this means that we want to show all workItems of a space, route /api/spaces/xyz/workitems
+		workItems, err := c.WorkItemStorage.GetBySpaceID(bson.ObjectIdHex(spaceID))
 		if err != nil {
 			return &api2go.Response{}, err
 		}
 		return &api2go.Response{Res: workItems}, nil
 	} 
-
 	// we want all workitems
+	// TODO we might want to limit that here
 	workItems, err := c.WorkItemStorage.GetAll()	
 	if err != nil {
 		return &api2go.Response{}, err

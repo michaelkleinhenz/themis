@@ -6,6 +6,18 @@ import (
 	"github.com/manyminds/api2go"
 )
 
+func GetPathID(r api2go.Request, typeStr string) (string, bool) {
+	spacesID, ok := r.QueryParams[typeStr]
+	if ok {
+		spaceID := spacesID[0]
+		return spaceID, true
+	}
+	return "", false
+}
+
+func GetSpaceID(r api2go.Request) (string, bool) {
+	return GetPathID(r, "spacesID")
+}
 
 func ParsePaging(r api2go.Request) (int, int, error) {
 	var number, size, offset, limit	string
