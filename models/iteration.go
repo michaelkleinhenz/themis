@@ -14,6 +14,7 @@ import (
 // Iteration is a time-boxed group of WorkItems.
 type Iteration struct {
 	ID                 bson.ObjectId `bson:"_id,omitempty" json:"-"`
+	DisplayID				 	 int				   `bson:"display_id" json:"display_id"`
 	EndAt              time.Time     `bson:"end_at" json:"endAt"`
 	StartAt            time.Time     `bson:"start_at" json:"startAt"`
 	Name               string        `bson:"name" json:"name"`

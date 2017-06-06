@@ -25,15 +25,20 @@ func NewWorkItemStorage(database *mgo.Database) *WorkItemStorage {
 func (workItemStorage *WorkItemStorage) Insert(workItem models.WorkItem) (bson.ObjectId, error) {
 	coll := workItemStorage.database.C(workItem.GetCollectionName())
   if workItem.ID != "" {
-    utils.ErrorLog.Printf("Given WorkItem instance already has an ID %s. Can not insert into database.\n", workItem.ID.String())
+    utils.ErrorLog.Printf("Given WorkItem instance already has an ID %s. Can not insert into database.\n", workItem.ID.Hex())
     return "", errors.New("Given WorkItem instance already has an ID. Can not insert into database")
   } 
   workItem.ID = bson.NewObjectId()
-  if err := coll.Insert(workItem); err != nil {
+  var err error
+	workItem.DisplayID, err = workItemStorage.NewDisplayID(workItem.SpaceID.Hex())
+	if err != nil {
+		return "", err
+	}
+  if err = coll.Insert(workItem); err != nil {
     utils.ErrorLog.Printf("Error while inserting new WorkItem with ID %s into database: %s", workItem.ID, err.Error())
     return "", err
   }
-  utils.DebugLog.Printf("Inserted new WorkItem with ID %s into database.", workItem.ID.String())
+  utils.DebugLog.Printf("Inserted new WorkItem with ID %s and display_id %d into database.", workItem.ID.Hex(), workItem.DisplayID)
   return workItem.ID, nil
 }
 
@@ -126,4 +131,20 @@ func (workItemStorage *WorkItemStorage) GetAllCount(queryExpression interface{})
     return -1, err
 	}
   return allCount, nil  
+}
+
+// NewDisplayID creates a new human-readable id.
+func (workItemStorage *WorkItemStorage) NewDisplayID(spaceID string) (int, error) {
+	coll := workItemStorage.database.C("workitems")
+	allWorkItems := new([]models.Iteration)
+  err := coll.Find(bson.M{"space_id": bson.ObjectIdHex(spaceID)}).Sort("-display_id").Limit(1).All(allWorkItems)
+  if err != nil { 
+    utils.ErrorLog.Printf("Error while retrieving latest display_id of WorkItems from database: %s", err.Error())
+    return -1, err
+	}
+	if len(*allWorkItems)>0 {
+		latestDisplayID := (*allWorkItems)[0].DisplayID
+		return latestDisplayID + 1, nil
+	}
+  return 0, nil  
 }

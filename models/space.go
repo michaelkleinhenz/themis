@@ -10,6 +10,7 @@ import (
 // Space is a project in Themis context.
 type Space struct {
     ID        			bson.ObjectId		`bson:"_id,omitempty" json:"-"`
+		DisplayID			  int    				  `bson:"display_id" json:"display_id"`
 		CreatedAt 			time.Time   		`bson:"created_at" json:"created-at"`
     UpdatedAt 			time.Time				`bson:"updated_at" json:"updated-at"`
     Name        		string          `bson:"name" json:"name"`
@@ -69,6 +70,16 @@ func (space Space) GetReferences() []jsonapi.Reference {
 		{
 			Type: "identities",
 			Name: "collaborators",
+			IsNotLoaded: true, // omit the data field, only generate links
+		},
+		{
+			Type: "workitemtypes",
+			Name: "workitemtypes",
+			IsNotLoaded: true, // omit the data field, only generate links
+		},
+		{
+			Type: "workitemlinktypes",
+			Name: "workitemlinktypes",
 			IsNotLoaded: true, // omit the data field, only generate links
 		},
 	}

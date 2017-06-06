@@ -24,15 +24,20 @@ func NewIterationStorage(database *mgo.Database) *IterationStorage {
 func (IterationStorage *IterationStorage) Insert(iteration models.Iteration) (bson.ObjectId, error) {
 	coll := IterationStorage.database.C(iteration.GetCollectionName())
 	if iteration.ID != "" {
-		utils.ErrorLog.Printf("Given Iteration instance already has an ID %s. Can not insert into database.\n", iteration.ID.String())
+		utils.ErrorLog.Printf("Given Iteration instance already has an ID %s. Can not insert into database.\n", iteration.ID.Hex())
 		return "", errors.New("Given Iteration instance already has an ID. Can not insert into database")
 	}
 	iteration.ID = bson.NewObjectId()
-	if err := coll.Insert(iteration); err != nil {
+  var err error
+	iteration.DisplayID, err = IterationStorage.NewDisplayID(iteration.SpaceID.Hex())
+	if err != nil {
+		return "", err
+	}
+	if err = coll.Insert(iteration); err != nil {
 		utils.ErrorLog.Printf("Error while inserting new Iteration with ID %s into database: %s", iteration.ID, err.Error())
 		return "", err
 	}
-	utils.DebugLog.Printf("Inserted new Iteration with ID %s into database.", iteration.ID.String())
+	utils.DebugLog.Printf("Inserted new Iteration with ID %s and display_id %d into database.", iteration.ID.Hex(), iteration.DisplayID)
 	return iteration.ID, nil
 }
 
@@ -121,3 +126,20 @@ func (IterationStorage *IterationStorage) GetAllCount(queryExpression interface{
 	}
   return allCount, nil  
 }
+
+// NewDisplayID creates a new human-readable id.
+func (IterationStorage *IterationStorage) NewDisplayID(spaceID string) (int, error) {
+	coll := IterationStorage.database.C("iterations")
+	allIterations := new([]models.Iteration)
+  err := coll.Find(bson.M{"space_id": bson.ObjectIdHex(spaceID)}).Sort("-display_id").Limit(1).All(allIterations)
+  if err != nil { 
+    utils.ErrorLog.Printf("Error while retrieving latest display_id of Iterations from database: %s", err.Error())
+    return -1, err
+	}
+	if len(*allIterations)>0 {
+		latestDisplayID := (*allIterations)[0].DisplayID
+		return latestDisplayID + 1, nil
+	}
+  return 0, nil  
+}
+

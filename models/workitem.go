@@ -12,6 +12,7 @@ import (
 type WorkItem struct {
 	ID               bson.ObjectId     `bson:"_id,omitempty" json:"-"`
 	Attributes       map[string]string `bson:"attributes" json:"attr"`
+	DisplayID				 int					  	 `bson:"display_id" json:"display_id"`
 	SpaceID          bson.ObjectId     `bson:"space_id" json:"-"`
 	CreatedAt        time.Time         `bson:"created_at" json:"-"`
 	UpdatedAt        time.Time         `bson:"updated_at" json:"-"`

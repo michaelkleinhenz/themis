@@ -24,15 +24,20 @@ func NewSpaceStorage(database *mgo.Database) *SpaceStorage {
 func (SpaceStorage *SpaceStorage) Insert(space models.Space) (bson.ObjectId, error) {
 	coll := SpaceStorage.database.C(space.GetCollectionName())
 	if space.ID != "" {
-		utils.ErrorLog.Printf("Given Space instance already has an ID %s. Can not insert into database.\n", space.ID.String())
+		utils.ErrorLog.Printf("Given Space instance already has an ID %s. Can not insert into database.\n", space.ID.Hex())
 		return "", errors.New("Given Space instance already has an ID. Can not insert into database")
 	}
 	space.ID = bson.NewObjectId()
+	var err error
+	space.DisplayID, err = SpaceStorage.NewDisplayID()
+	if err != nil {
+		return "", err
+	}
 	if err := coll.Insert(space); err != nil {
 		utils.ErrorLog.Printf("Error while inserting new Space with ID %s into database: %s", space.ID, err.Error())
 		return "", err
 	}
-	utils.DebugLog.Printf("Inserted new Space with ID %s into database.", space.ID.String())
+	utils.DebugLog.Printf("Inserted new Space with ID %s and display_id %d into database.", space.ID.Hex(), space.DisplayID)
 	return space.ID, nil
 }
 
@@ -121,3 +126,20 @@ func (SpaceStorage *SpaceStorage) GetAllCount(queryExpression interface{}) (int,
 	}
   return allCount, nil  
 }
+
+// NewDisplayID creates a new human-readable id.
+func (SpaceStorage *SpaceStorage) NewDisplayID() (int, error) {
+	coll := SpaceStorage.database.C("spaces")
+	allSpaces := new([]models.Iteration)
+  err := coll.Find(nil).Sort("-display_id").Limit(1).All(allSpaces)
+  if err != nil { 
+    utils.ErrorLog.Printf("Error while retrieving latest display_id of WorkItems from database: %s", err.Error())
+    return -1, err
+	}
+	if len(*allSpaces)>0 {
+		latestDisplayID := (*allSpaces)[0].DisplayID
+		return latestDisplayID + 1, nil
+	}
+  return 0, nil  
+}
+

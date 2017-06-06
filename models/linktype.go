@@ -37,7 +37,7 @@ func NewLinkType() (linkType *LinkType) {
 
 // GetCollectionName returns the database collection name.
 func (linkType LinkType) GetCollectionName() string {
-  return "linktypes"
+  return "workitemlinktypes"
 }
 
 // GetID returns the ID for marshalling to json.
