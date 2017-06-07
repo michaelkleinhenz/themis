@@ -7,6 +7,9 @@ import (
   "github.com/manyminds/api2go/jsonapi"
 )
 
+// WorkItemTypeName stores the common type name.
+const WorkItemTypeName = "workitemtypes"
+
 // WorkItemTypeFieldDescriptor is a descriptor for a specific field.
 type WorkItemTypeFieldDescriptor struct {
     ComponentType       string              `bson:"component_type" json:"componentType"`
@@ -47,7 +50,7 @@ func NewWorkItemType() (workItemType *WorkItemType) {
 
 // GetCollectionName returns the database collection name.
 func (workItemType WorkItemType) GetCollectionName() string {
-  return "workitemtypes"
+  return WorkItemTypeName
 }
 
 // GetID returns the ID for marshalling to json.

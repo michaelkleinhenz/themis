@@ -88,7 +88,7 @@ var _ = BeforeSuite(func() {
 	api.AddResource(models.Link{}, resources.LinkResource{LinkStorage: storageBackends.Link})
 	api.AddResource(models.LinkCategory{}, resources.LinkCategoryResource{LinkCategoryStorage: storageBackends.LinkCategory})
 	api.AddResource(models.LinkType{}, resources.LinkTypeResource{LinkTypeStorage: storageBackends.LinkType})
-	api.AddResource(models.User{}, resources.UserResource{UserStorage: storageBackends.User})
+	api.AddResource(models.User{}, resources.UserResource{UserStorage: storageBackends.User, SpaceStorage: storageBackends.Space})
 	api.AddResource(models.WorkItemType{}, resources.WorkItemTypeResource{WorkItemTypeStorage: storageBackends.WorkItemType})
 	routes.Init(r)
 	go r.Run(configuration.ServicePort)

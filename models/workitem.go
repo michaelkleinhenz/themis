@@ -8,6 +8,9 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// WorkItemName stores the common type name.
+const WorkItemName = "workitems"
+
 // WorkItem is a base entity for Themis.
 type WorkItem struct {
 	ID               bson.ObjectId     `bson:"_id,omitempty" json:"-"`
@@ -35,7 +38,7 @@ func NewWorkItem() (wItem *WorkItem) {
 
 // GetCollectionName returns the collection name for this entity type.
 func (workItem *WorkItem) GetCollectionName() string {
-	return "workitems"
+	return WorkItemName
 }
 
 // JSONAPI encoding functions

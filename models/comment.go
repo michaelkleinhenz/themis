@@ -7,6 +7,9 @@ import (
     "github.com/manyminds/api2go/jsonapi"
 )
 
+// CommentName stores the common type name.
+const CommentName = "comments"
+
 // Comment is a comment on a WorkItem.
 type Comment struct {
     ID                  bson.ObjectId       `bson:"_id,omitempty" json:"-"`
@@ -27,7 +30,7 @@ func NewComment() (comment *Comment) {
 
 // GetCollectionName returns the database collection name.
 func (comment Comment) GetCollectionName() string {
-  return "comments"
+  return CommentName
 }
 
 // GetID returns the ID for marshalling to json.

@@ -53,7 +53,7 @@ func (LinkCategoryStorage *LinkCategoryStorage) Update(linkCategory models.LinkC
 
 // Delete removes a record from the database.
 func (LinkCategoryStorage *LinkCategoryStorage) Delete(id bson.ObjectId) error {
-	coll := LinkCategoryStorage.database.C(new(models.LinkCategory).GetCollectionName()) // TODO this should not use memory
+	coll := LinkCategoryStorage.database.C(models.LinkCategoryName) // TODO this should not use memory
 	if id == "" {
 		utils.ErrorLog.Println("Given LinkCategory instance has an empty ID. Can not be deleted from database.")
 		return errors.New("Given LinkCategory instance has an empty ID. Can not be updated from database")
@@ -86,7 +86,7 @@ func (LinkCategoryStorage *LinkCategoryStorage) GetOne(id bson.ObjectId) (models
 // GetAll returns an entity from the database based on a given ID.
 func (LinkCategoryStorage *LinkCategoryStorage) GetAll(queryExpression interface{}) ([]models.LinkCategory, error) {
 	allLinkCategorys := new([]models.LinkCategory)
-	coll := LinkCategoryStorage.database.C(new(models.LinkCategory).GetCollectionName())
+	coll := LinkCategoryStorage.database.C(models.LinkCategoryName)
 	if err := coll.Find(queryExpression).All(allLinkCategorys); err != nil {
 		utils.ErrorLog.Printf("Error while retrieving all LinkCategorys from database: %s", err.Error())
 		return nil, err
@@ -100,7 +100,7 @@ func (LinkCategoryStorage *LinkCategoryStorage) GetAllPaged(queryExpression inte
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allLinkCategorys := new([]models.LinkCategory)
-	coll := LinkCategoryStorage.database.C(new(models.LinkCategory).GetCollectionName())
+	coll := LinkCategoryStorage.database.C(models.LinkCategoryName)
   query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allLinkCategorys); err != nil { 
@@ -113,7 +113,7 @@ func (LinkCategoryStorage *LinkCategoryStorage) GetAllPaged(queryExpression inte
 
 // GetAllCount returns the number of elements in the database.
 func (LinkCategoryStorage *LinkCategoryStorage) GetAllCount(queryExpression interface{}) (int, error) {
-	coll := LinkCategoryStorage.database.C(new(models.LinkCategory).GetCollectionName())
+	coll := LinkCategoryStorage.database.C(models.LinkCategoryName)
   allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of LinkCategorys from database: %s", err.Error())

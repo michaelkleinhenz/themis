@@ -7,6 +7,9 @@ import (
 	"github.com/manyminds/api2go/jsonapi"
 )
 
+// SpaceName stores the common type name.
+const SpaceName = "spaces"
+
 // Space is a project in Themis context.
 type Space struct {
     ID        			bson.ObjectId		`bson:"_id,omitempty" json:"-"`
@@ -16,8 +19,8 @@ type Space struct {
     Name        		string          `bson:"name" json:"name"`
     Description 		string          `bson:"description" json:"description"`
     Version     		int             `bson:"version" json:"version"`
-    CollaboratorIDs []bson.ObjectId	`bson:"collaborator_ids" json:"-"`
-    OwnerID 				bson.ObjectId		`bson:"owned-by" json:"-"`
+    CollaboratorIDs []bson.ObjectId	`bson:"collaborator_ids,omitempty" json:"-"`
+    OwnerID 				bson.ObjectId		`bson:"owned-by,omitempty" json:"-"`
 }
 
 // NewSpace creates a new Space instance.
@@ -30,7 +33,7 @@ func NewSpace() (space *Space) {
 
 // GetCollectionName returns the collection name for this entity type.
 func (space Space) GetCollectionName() string {
-  return "spaces"
+  return SpaceName
 }
 
 // GetID returns the ID for marshalling to json.

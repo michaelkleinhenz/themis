@@ -53,7 +53,7 @@ func (WorkItemTypeStorage *WorkItemTypeStorage) Update(workItemType models.WorkI
 
 // Delete removes a record from the database.
 func (WorkItemTypeStorage *WorkItemTypeStorage) Delete(id bson.ObjectId) error {
-	coll := WorkItemTypeStorage.database.C(new(models.WorkItemType).GetCollectionName()) // TODO this should not use memory
+	coll := WorkItemTypeStorage.database.C(models.WorkItemTypeName) // TODO this should not use memory
 	if id == "" {
 		utils.ErrorLog.Println("Given WorkItemType instance has an empty ID. Can not be deleted from database.")
 		return errors.New("Given WorkItemType instance has an empty ID. Can not be updated from database")
@@ -86,7 +86,7 @@ func (WorkItemTypeStorage *WorkItemTypeStorage) GetOne(id bson.ObjectId) (models
 // GetAll returns an entity from the database based on a given ID.
 func (WorkItemTypeStorage *WorkItemTypeStorage) GetAll(queryExpression interface{}) ([]models.WorkItemType, error) {
 	allWorkItemTypes := new([]models.WorkItemType)
-	coll := WorkItemTypeStorage.database.C(new(models.WorkItemType).GetCollectionName())
+	coll := WorkItemTypeStorage.database.C(models.WorkItemTypeName)
 	if err := coll.Find(queryExpression).All(allWorkItemTypes); err != nil {
 		utils.ErrorLog.Printf("Error while retrieving all WorkItemTypes from database: %s", err.Error())
 		return nil, err
@@ -100,7 +100,7 @@ func (WorkItemTypeStorage *WorkItemTypeStorage) GetAllPaged(queryExpression inte
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allWorkItemTypes := new([]models.WorkItemType)
-	coll := WorkItemTypeStorage.database.C(new(models.WorkItemType).GetCollectionName())
+	coll := WorkItemTypeStorage.database.C(models.WorkItemTypeName)
   query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allWorkItemTypes); err != nil { 
@@ -113,7 +113,7 @@ func (WorkItemTypeStorage *WorkItemTypeStorage) GetAllPaged(queryExpression inte
 
 // GetAllCount returns the number of elements in the database.
 func (WorkItemTypeStorage *WorkItemTypeStorage) GetAllCount(queryExpression interface{}) (int, error) {
-	coll := WorkItemTypeStorage.database.C(new(models.WorkItemType).GetCollectionName())
+	coll := WorkItemTypeStorage.database.C(models.WorkItemTypeName)
   allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of WorkItemTypes from database: %s", err.Error())

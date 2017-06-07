@@ -53,7 +53,7 @@ func (LinkStorage *LinkStorage) Update(link models.Link) error {
 
 // Delete removes a record from the database.
 func (LinkStorage *LinkStorage) Delete(id bson.ObjectId) error {
-	coll := LinkStorage.database.C(new(models.Link).GetCollectionName()) // TODO this should not use memory
+	coll := LinkStorage.database.C(models.LinkName) // TODO this should not use memory
 	if id == "" {
 		utils.ErrorLog.Println("Given Link instance has an empty ID. Can not be deleted from database.")
 		return errors.New("Given Link instance has an empty ID. Can not be updated from database")
@@ -86,7 +86,7 @@ func (LinkStorage *LinkStorage) GetOne(id bson.ObjectId) (models.Link, error) {
 // GetAll returns an entity from the database based on a given ID.
 func (LinkStorage *LinkStorage) GetAll(queryExpression interface{}) ([]models.Link, error) {
 	allLinks := new([]models.Link)
-	coll := LinkStorage.database.C(new(models.Link).GetCollectionName())
+	coll := LinkStorage.database.C(models.LinkName)
 	if err := coll.Find(queryExpression).All(allLinks); err != nil {
 		utils.ErrorLog.Printf("Error while retrieving all Links from database: %s", err.Error())
 		return nil, err
@@ -100,7 +100,7 @@ func (LinkStorage *LinkStorage) GetAllPaged(queryExpression interface{}, offset 
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allLinks := new([]models.Link)
-	coll := LinkStorage.database.C(new(models.Link).GetCollectionName())
+	coll := LinkStorage.database.C(models.LinkName)
   query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allLinks); err != nil { 
@@ -113,7 +113,7 @@ func (LinkStorage *LinkStorage) GetAllPaged(queryExpression interface{}, offset 
 
 // GetAllCount returns the number of elements in the database.
 func (LinkStorage *LinkStorage) GetAllCount(queryExpression interface{}) (int, error) {
-	coll := LinkStorage.database.C(new(models.Link).GetCollectionName())
+	coll := LinkStorage.database.C(models.LinkName)
   allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of Links from database: %s", err.Error())

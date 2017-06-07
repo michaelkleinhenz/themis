@@ -53,7 +53,7 @@ func (AreaStorage *AreaStorage) Update(area models.Area) error {
 
 // Delete removes a record from the database.
 func (AreaStorage *AreaStorage) Delete(id bson.ObjectId) error {
-	coll := AreaStorage.database.C(new(models.Area).GetCollectionName()) // TODO this should not use memory
+	coll := AreaStorage.database.C(models.AreaName) // TODO this should not use memory
 	if id == "" {
 		utils.ErrorLog.Println("Given Area instance has an empty ID. Can not be deleted from database.")
 		return errors.New("Given Area instance has an empty ID. Can not be updated from database")
@@ -86,7 +86,7 @@ func (AreaStorage *AreaStorage) GetOne(id bson.ObjectId) (models.Area, error) {
 // GetAll returns an entity from the database based on a given ID.
 func (AreaStorage *AreaStorage) GetAll(queryExpression interface{}) ([]models.Area, error) {
 	allAreas := new([]models.Area)
-	coll := AreaStorage.database.C(new(models.Area).GetCollectionName())
+	coll := AreaStorage.database.C(models.AreaName)
 	if err := coll.Find(queryExpression).All(allAreas); err != nil {
 		utils.ErrorLog.Printf("Error while retrieving all Areas from database: %s", err.Error())
 		return nil, err
@@ -100,7 +100,7 @@ func (AreaStorage *AreaStorage) GetAllPaged(queryExpression interface{}, offset 
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allAreas := new([]models.Area)
-	coll := AreaStorage.database.C(new(models.Area).GetCollectionName())
+	coll := AreaStorage.database.C(models.AreaName)
   query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allAreas); err != nil { 
@@ -113,7 +113,7 @@ func (AreaStorage *AreaStorage) GetAllPaged(queryExpression interface{}, offset 
 
 // GetAllCount returns the number of elements in the database.
 func (AreaStorage *AreaStorage) GetAllCount(queryExpression interface{}) (int, error) {
-	coll := AreaStorage.database.C(new(models.Area).GetCollectionName())
+	coll := AreaStorage.database.C(models.AreaName)
   allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of Areas from database: %s", err.Error())

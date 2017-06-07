@@ -11,6 +11,9 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// IterationName stores the common type name.
+const IterationName = "iterations"
+
 // Iteration is a time-boxed group of WorkItems.
 type Iteration struct {
 	ID                 bson.ObjectId `bson:"_id,omitempty" json:"-"`
@@ -38,7 +41,7 @@ func NewIteration() (iteration *Iteration) {
 
 // GetCollectionName returns the database collection name.
 func (iteration Iteration) GetCollectionName() string {
-	return "iterations"
+	return IterationName
 }
 
 // GetID returns the ID for marshalling to json.

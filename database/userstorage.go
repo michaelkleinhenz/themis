@@ -53,7 +53,7 @@ func (UserStorage *UserStorage) Update(user models.User) error {
 
 // Delete removes a record from the database.
 func (UserStorage *UserStorage) Delete(id bson.ObjectId) error {
-	coll := UserStorage.database.C(new(models.User).GetCollectionName()) // TODO this should not use memory
+	coll := UserStorage.database.C(models.UserName) // TODO this should not use memory
 	if id == "" {
 		utils.ErrorLog.Println("Given User instance has an empty ID. Can not be deleted from database.")
 		return errors.New("Given User instance has an empty ID. Can not be updated from database")
@@ -86,7 +86,7 @@ func (UserStorage *UserStorage) GetOne(id bson.ObjectId) (models.User, error) {
 // GetAll returns an entity from the database based on a given ID.
 func (UserStorage *UserStorage) GetAll(queryExpression interface{}) ([]models.User, error) {
 	allUsers := new([]models.User)
-	coll := UserStorage.database.C(new(models.User).GetCollectionName())
+	coll := UserStorage.database.C(models.UserName)
 	if err := coll.Find(queryExpression).All(allUsers); err != nil {
 		utils.ErrorLog.Printf("Error while retrieving all Users from database: %s", err.Error())
 		return nil, err
@@ -100,7 +100,7 @@ func (UserStorage *UserStorage) GetAllPaged(queryExpression interface{}, offset 
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allUsers := new([]models.User)
-	coll := UserStorage.database.C(new(models.User).GetCollectionName())
+	coll := UserStorage.database.C(models.UserName)
   query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allUsers); err != nil { 
@@ -113,7 +113,7 @@ func (UserStorage *UserStorage) GetAllPaged(queryExpression interface{}, offset 
 
 // GetAllCount returns the number of elements in the database.
 func (UserStorage *UserStorage) GetAllCount(queryExpression interface{}) (int, error) {
-	coll := UserStorage.database.C(new(models.User).GetCollectionName())
+	coll := UserStorage.database.C(models.UserName)
   allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of Users from database: %s", err.Error())

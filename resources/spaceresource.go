@@ -15,13 +15,39 @@ import (
 // SpaceResource for api2go routes.
 type SpaceResource struct {
 	SpaceStorage *database.SpaceStorage
+	WorkItemTypeStorage *database.WorkItemTypeStorage
+}
+
+func (c SpaceResource) getFilterFromRequest(r api2go.Request) (bson.M, error) {
+	var filter bson.M
+	// Getting reference context
+	sourceContext, sourceContextID, thisContext := utils.ParseContext(r)
+	if (sourceContext == models.WorkItemTypeName) {
+		workItemType, err := c.WorkItemTypeStorage.GetOne(bson.ObjectIdHex(sourceContextID))
+		if (err != nil) {
+			return nil, err
+		}
+		if thisContext == "space" {
+			filter = bson.M{"_id": workItemType.SpaceID}
+		}
+	} else {
+		// build standard filter expression
+		filter = (utils.BuildDbFilterFromRequest(r)).(bson.M)
+	}
+	return filter, nil
 }
 
 // FindAll Spaces.
 func (c SpaceResource) FindAll(r api2go.Request) (api2go.Responder, error) {
 	// build filter expression
-	var filter interface{} = utils.BuildDbFilterFromRequest(r)
-	spaces, _ := c.SpaceStorage.GetAll(filter)
+	filter, err := c.getFilterFromRequest(r)
+	if err != nil {
+		return api2go.Response{}, err
+	}
+	spaces, err := c.SpaceStorage.GetAll(filter)
+	if err != nil {
+		return api2go.Response{}, err
+	}
 	return &api2go.Response{Res: spaces}, nil
 }
 
@@ -30,7 +56,10 @@ func (c SpaceResource) FindAll(r api2go.Request) (api2go.Responder, error) {
 func (c SpaceResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Responder, error) {
 
 	// build filter expression
-	var filter interface{} = utils.BuildDbFilterFromRequest(r)
+	filter, err := c.getFilterFromRequest(r)
+	if err != nil {
+		return 0, api2go.Response{}, err
+	}
 
 	// parse out offset and limit
 	queryOffset, queryLimit, err := utils.ParsePaging(r)

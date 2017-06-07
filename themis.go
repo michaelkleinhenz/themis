@@ -51,7 +51,7 @@ func main() {
 	)
 
 	r.StaticFile("/", "./static/index.html")
-	api.AddResource(models.Space{}, resources.SpaceResource{SpaceStorage: storageBackends.Space})
+	api.AddResource(models.Space{}, resources.SpaceResource{SpaceStorage: storageBackends.Space, WorkItemTypeStorage: storageBackends.WorkItemType})
 	api.AddResource(models.WorkItem{}, resources.WorkItemResource{WorkItemStorage: storageBackends.WorkItem})
 	api.AddResource(models.Area{}, resources.AreaResource{AreaStorage: storageBackends.Area})
 	api.AddResource(models.Comment{}, resources.CommentResource{CommentStorage: storageBackends.Comment})
@@ -59,7 +59,7 @@ func main() {
 	api.AddResource(models.Link{}, resources.LinkResource{LinkStorage: storageBackends.Link})
 	api.AddResource(models.LinkCategory{}, resources.LinkCategoryResource{LinkCategoryStorage: storageBackends.LinkCategory})
 	api.AddResource(models.LinkType{}, resources.LinkTypeResource{LinkTypeStorage: storageBackends.LinkType})
-	api.AddResource(models.User{}, resources.UserResource{UserStorage: storageBackends.User})
+	api.AddResource(models.User{}, resources.UserResource{UserStorage: storageBackends.User, SpaceStorage: storageBackends.Space})
 	api.AddResource(models.WorkItemType{}, resources.WorkItemTypeResource{WorkItemTypeStorage: storageBackends.WorkItemType})
 	routes.Init(r)
 	r.Run(configuration.ServicePort)

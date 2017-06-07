@@ -2,45 +2,65 @@ package utils
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/manyminds/api2go"
 	"gopkg.in/mgo.v2/bson"
 )
 
+// ParseContext parses a possible subquery context, returning the parsed context keys.
+// Example:
+//   http://localhost:8080/api/workitemtypes/abc123/space has a QueryParams map:
+//   map[workitemtypesID:[abc123] workitemtypesName:[space]]
+// which will return
+//   workitemtypes, abc123, space
+func ParseContext(r api2go.Request) (sourceContext string, sourceContextID string, thisContext string) {
+	for key, value := range r.QueryParams {
+		if strings.HasSuffix(key, "ID") {
+			sourceContextID = value[0]
+			sourceContext = strings.Replace(key, "ID", "", -1)
+		}
+		if strings.HasSuffix(key, "Name") {
+			thisContext = value[0]
+		}
+	}
+	return sourceContext, sourceContextID, thisContext
+}
+
 // BuildDbFilterFromRequest builds the filter structure from the request.
 func BuildDbFilterFromRequest(r api2go.Request) interface{} {
 	var filter interface{}
-	spaceID, ok := getPathParam(r, "spacesID")
+	spaceID, ok := GetPathParam(r, "spacesID")
 	if ok {
 		filter = bson.M{"space_id": bson.ObjectIdHex(spaceID)}
-	} 
-	workitemID, ok := getPathParam(r, "workitemID")
+	}
+	workitemID, ok := GetPathParam(r, "workitemID")
 	if ok {
 		if filter == nil {
 			filter = bson.M{}
 		}
 		(filter.(bson.M))["workitem_id"] = workitemID
-	} 
-	iterationsID, ok := getPathParam(r, "iterationsID")
+	}
+	iterationsID, ok := GetPathParam(r, "iterationsID")
 	if ok {
 		if filter == nil {
 			filter = bson.M{}
 		}
 		(filter.(bson.M))["iteration_id"] = iterationsID
-	} 
-	areasID, ok := getPathParam(r, "areasID")
+	}
+	areasID, ok := GetPathParam(r, "areasID")
 	if ok {
 		if filter == nil {
 			filter = bson.M{}
 		}
 		(filter.(bson.M))["area_id"] = areasID
-	} 
+	}
 	return filter
 }
 
 // ParsePaging parses the paging parameters of a request and returns them in a normalized version (start, limit).
 func ParsePaging(r api2go.Request) (int, int, error) {
-	var number, size, offset, limit	string
+	var number, size, offset, limit string
 
 	numberQuery, ok := r.QueryParams["page[number]"]
 	if ok {
@@ -84,17 +104,18 @@ func ParsePaging(r api2go.Request) (int, int, error) {
 			return -1, -1, err
 		}
 		resultStart = offsetI
-		resultLimit = limitI		
+		resultLimit = limitI
 	}
 
 	return resultStart, resultLimit, nil
 }
 
-func getPathParam(r api2go.Request, typeStr string) (string, bool) {
-	spacesID, ok := r.QueryParams[typeStr]
+// GetPathParam parses out a param from a QueryParam.
+func GetPathParam(r api2go.Request, key string) (string, bool) {
+	values, ok := r.QueryParams[key]
 	if ok {
-		spaceID := spacesID[0]
-		return spaceID, true
+		value := values[0]
+		return value, true
 	}
 	return "", false
 }

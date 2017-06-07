@@ -7,6 +7,9 @@ import (
   "github.com/manyminds/api2go/jsonapi"
 )
 
+// AreaName stores the common type name.
+const AreaName = "areas"
+
 // Area is a component of a space.
 type Area struct {
     ID                  bson.ObjectId       `bson:"_id,omitempty" json:"-"`
@@ -30,7 +33,7 @@ func NewArea() (area *Area) {
 
 // GetCollectionName returns the database collection name.
 func (area Area) GetCollectionName() string {
-  return "areas"
+  return AreaName
 }
 
 // GetID returns the ID for marshalling to json.

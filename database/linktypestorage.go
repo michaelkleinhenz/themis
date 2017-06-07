@@ -53,7 +53,7 @@ func (LinkTypeStorage *LinkTypeStorage) Update(linkType models.LinkType) error {
 
 // Delete removes a record from the database.
 func (LinkTypeStorage *LinkTypeStorage) Delete(id bson.ObjectId) error {
-	coll := LinkTypeStorage.database.C(new(models.LinkType).GetCollectionName()) // TODO this should not use memory
+	coll := LinkTypeStorage.database.C(models.LinkTypeName) // TODO this should not use memory
 	if id == "" {
 		utils.ErrorLog.Println("Given LinkType instance has an empty ID. Can not be deleted from database.")
 		return errors.New("Given LinkType instance has an empty ID. Can not be updated from database")
@@ -86,7 +86,7 @@ func (LinkTypeStorage *LinkTypeStorage) GetOne(id bson.ObjectId) (models.LinkTyp
 // GetAll returns an entity from the database based on a given ID.
 func (LinkTypeStorage *LinkTypeStorage) GetAll(queryExpression interface{}) ([]models.LinkType, error) {
 	allLinkTypes := new([]models.LinkType)
-	coll := LinkTypeStorage.database.C(new(models.LinkType).GetCollectionName())
+	coll := LinkTypeStorage.database.C(models.LinkTypeName)
 	if err := coll.Find(queryExpression).All(allLinkTypes); err != nil {
 		utils.ErrorLog.Printf("Error while retrieving all LinkTypes from database: %s", err.Error())
 		return nil, err
@@ -100,7 +100,7 @@ func (LinkTypeStorage *LinkTypeStorage) GetAllPaged(queryExpression interface{},
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allLinkTypes := new([]models.LinkType)
-	coll := LinkTypeStorage.database.C(new(models.LinkType).GetCollectionName())
+	coll := LinkTypeStorage.database.C(models.LinkTypeName)
   query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allLinkTypes); err != nil { 
@@ -113,7 +113,7 @@ func (LinkTypeStorage *LinkTypeStorage) GetAllPaged(queryExpression interface{},
 
 // GetAllCount returns the number of elements in the database.
 func (LinkTypeStorage *LinkTypeStorage) GetAllCount(queryExpression interface{}) (int, error) {
-	coll := LinkTypeStorage.database.C(new(models.LinkType).GetCollectionName())
+	coll := LinkTypeStorage.database.C(models.LinkTypeName)
   allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of LinkTypes from database: %s", err.Error())

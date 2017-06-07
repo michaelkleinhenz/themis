@@ -7,6 +7,9 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// LinkTypeName stores the common type name.
+const LinkTypeName = "workitemlinktypes"
+
 // LinkType is a type for a link.
 type LinkType struct {
     ID                  	bson.ObjectId       `bson:"_id,omitempty" json:"-"`
@@ -37,7 +40,7 @@ func NewLinkType() (linkType *LinkType) {
 
 // GetCollectionName returns the database collection name.
 func (linkType LinkType) GetCollectionName() string {
-  return "workitemlinktypes"
+  return LinkTypeName
 }
 
 // GetID returns the ID for marshalling to json.

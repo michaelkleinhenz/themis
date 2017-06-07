@@ -53,7 +53,7 @@ func (CommentStorage *CommentStorage) Update(comment models.Comment) error {
 
 // Delete removes a record from the database.
 func (CommentStorage *CommentStorage) Delete(id bson.ObjectId) error {
-	coll := CommentStorage.database.C(new(models.Comment).GetCollectionName()) // TODO this should not use memory
+	coll := CommentStorage.database.C(models.CommentName) // TODO this should not use memory
 	if id == "" {
 		utils.ErrorLog.Println("Given Comment instance has an empty ID. Can not be deleted from database.")
 		return errors.New("Given Comment instance has an empty ID. Can not be updated from database")
@@ -86,7 +86,7 @@ func (CommentStorage *CommentStorage) GetOne(id bson.ObjectId) (models.Comment, 
 // GetAll returns an entity from the database based on a given ID.
 func (CommentStorage *CommentStorage) GetAll(queryExpression interface{}) ([]models.Comment, error) {
 	allComments := new([]models.Comment)
-	coll := CommentStorage.database.C(new(models.Comment).GetCollectionName())
+	coll := CommentStorage.database.C(models.CommentName)
 	if err := coll.Find(queryExpression).All(allComments); err != nil {
 		utils.ErrorLog.Printf("Error while retrieving all Comments from database: %s", err.Error())
 		return nil, err
@@ -100,7 +100,7 @@ func (CommentStorage *CommentStorage) GetAllPaged(queryExpression interface{}, o
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allComments := new([]models.Comment)
-	coll := CommentStorage.database.C(new(models.Comment).GetCollectionName())
+	coll := CommentStorage.database.C(models.CommentName)
   query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allComments); err != nil { 
@@ -113,7 +113,7 @@ func (CommentStorage *CommentStorage) GetAllPaged(queryExpression interface{}, o
 
 // GetAllCount returns the number of elements in the database.
 func (CommentStorage *CommentStorage) GetAllCount(queryExpression interface{}) (int, error) {
-	coll := CommentStorage.database.C(new(models.Comment).GetCollectionName())
+	coll := CommentStorage.database.C(models.CommentName)
   allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of Comments from database: %s", err.Error())

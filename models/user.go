@@ -7,6 +7,9 @@ import (
   "github.com/manyminds/api2go/jsonapi"
 )
 
+// UserName stores the common type name.
+const UserName = "identities"
+
 // User is a user in the system.
 type User struct {
     ID        bson.ObjectId		`bson:"_id,omitempty" json:"-"`
@@ -27,7 +30,7 @@ func NewUser() (user *User) {
 
 // GetCollectionName returns the database collection name.
 func (user User) GetCollectionName() string {
-  return "identities"
+  return UserName
 }
 
 // GetID returns the ID for marshalling to json.

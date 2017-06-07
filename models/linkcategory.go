@@ -7,6 +7,9 @@ import (
   "github.com/manyminds/api2go/jsonapi"
 )
 
+// LinkCategoryName stores the common type name.
+const LinkCategoryName = "linkcategories"
+
 // LinkCategory is a link category.
 type LinkCategory struct {
     ID                  bson.ObjectId `bson:"_id,omitempty" json:"-"`
@@ -29,7 +32,7 @@ func NewLinkCategory() (linkCategory *LinkCategory) {
 
 // GetCollectionName returns the database collection name.
 func (linkCategory LinkCategory) GetCollectionName() string {
-  return "linkcategories"
+  return LinkCategoryName
 }
 
 // GetID returns the ID for marshalling to json.
