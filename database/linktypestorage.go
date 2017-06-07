@@ -91,7 +91,7 @@ func (LinkTypeStorage *LinkTypeStorage) GetAll(queryExpression interface{}) ([]m
 		utils.ErrorLog.Printf("Error while retrieving all LinkTypes from database: %s", err.Error())
 		return nil, err
 	}
-	utils.DebugLog.Printf("Retrieved all LinkTypes from database.")
+	utils.DebugLog.Printf("Retrieved LinkTypes from database with filter %s.", queryExpression)
 	return *allLinkTypes, nil
 }
 
@@ -107,7 +107,7 @@ func (LinkTypeStorage *LinkTypeStorage) GetAllPaged(queryExpression interface{},
     utils.ErrorLog.Printf("Error while retrieving paged LinkTypes from database: %s", err.Error())
     return nil, err
 	}
-  utils.DebugLog.Printf("Retrieved paged LinkTypes from database.")  
+	utils.DebugLog.Printf("Retrieved paged LinkTypes from database with filter %s.", queryExpression)
   return *allLinkTypes, nil
 }
 
@@ -119,5 +119,6 @@ func (LinkTypeStorage *LinkTypeStorage) GetAllCount(queryExpression interface{})
     utils.ErrorLog.Printf("Error while retrieving number of LinkTypes from database: %s", err.Error())
     return -1, err
 	}
+	utils.DebugLog.Printf("Retrieved LinkTypes count from database with filter %s.", queryExpression)
   return allCount, nil  
 }

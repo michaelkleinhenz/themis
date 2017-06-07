@@ -91,7 +91,7 @@ func (UserStorage *UserStorage) GetAll(queryExpression interface{}) ([]models.Us
 		utils.ErrorLog.Printf("Error while retrieving all Users from database: %s", err.Error())
 		return nil, err
 	}
-	utils.DebugLog.Printf("Retrieved all Users from database.")
+	utils.DebugLog.Printf("Retrieved Users from database with filter %s.", queryExpression)
 	return *allUsers, nil
 }
 
@@ -107,7 +107,7 @@ func (UserStorage *UserStorage) GetAllPaged(queryExpression interface{}, offset 
     utils.ErrorLog.Printf("Error while retrieving paged Users from database: %s", err.Error())
     return nil, err
 	}
-  utils.DebugLog.Printf("Retrieved paged Users from database.")  
+	utils.DebugLog.Printf("Retrieved paged Users from database with filter %s.", queryExpression)
   return *allUsers, nil
 }
 
@@ -119,5 +119,6 @@ func (UserStorage *UserStorage) GetAllCount(queryExpression interface{}) (int, e
     utils.ErrorLog.Printf("Error while retrieving number of Users from database: %s", err.Error())
     return -1, err
 	}
+	utils.DebugLog.Printf("Retrieved Users count from database with filter %s.", queryExpression)
   return allCount, nil  
 }

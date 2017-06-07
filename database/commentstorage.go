@@ -91,7 +91,7 @@ func (CommentStorage *CommentStorage) GetAll(queryExpression interface{}) ([]mod
 		utils.ErrorLog.Printf("Error while retrieving all Comments from database: %s", err.Error())
 		return nil, err
 	}
-	utils.DebugLog.Printf("Retrieved all Comments from database.")
+	utils.DebugLog.Printf("Retrieved Comments from database with filter %s.", queryExpression)
 	return *allComments, nil
 }
 
@@ -107,7 +107,7 @@ func (CommentStorage *CommentStorage) GetAllPaged(queryExpression interface{}, o
     utils.ErrorLog.Printf("Error while retrieving paged Comments from database: %s", err.Error())
     return nil, err
 	}
-  utils.DebugLog.Printf("Retrieved paged Comments from database.")  
+	utils.DebugLog.Printf("Retrieved paged Comments from database with filter %s.", queryExpression)
   return *allComments, nil
 }
 
@@ -119,5 +119,6 @@ func (CommentStorage *CommentStorage) GetAllCount(queryExpression interface{}) (
     utils.ErrorLog.Printf("Error while retrieving number of Comments from database: %s", err.Error())
     return -1, err
 	}
+	utils.DebugLog.Printf("Retrieved Comments count from database with filter %s.", queryExpression)
   return allCount, nil  
 }

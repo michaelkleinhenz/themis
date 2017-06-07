@@ -91,7 +91,7 @@ func (LinkCategoryStorage *LinkCategoryStorage) GetAll(queryExpression interface
 		utils.ErrorLog.Printf("Error while retrieving all LinkCategorys from database: %s", err.Error())
 		return nil, err
 	}
-	utils.DebugLog.Printf("Retrieved all LinkCategorys from database.")
+	utils.DebugLog.Printf("Retrieved LinkCategories from database with filter %s.", queryExpression)
 	return *allLinkCategorys, nil
 }
 
@@ -107,7 +107,7 @@ func (LinkCategoryStorage *LinkCategoryStorage) GetAllPaged(queryExpression inte
     utils.ErrorLog.Printf("Error while retrieving paged LinkCategorys from database: %s", err.Error())
     return nil, err
 	}
-  utils.DebugLog.Printf("Retrieved paged LinkCategorys from database.")  
+	utils.DebugLog.Printf("Retrieved paged LinkCategories from database with filter %s.", queryExpression)
   return *allLinkCategorys, nil
 }
 
@@ -119,5 +119,6 @@ func (LinkCategoryStorage *LinkCategoryStorage) GetAllCount(queryExpression inte
     utils.ErrorLog.Printf("Error while retrieving number of LinkCategorys from database: %s", err.Error())
     return -1, err
 	}
+	utils.DebugLog.Printf("Retrieved LinkCategories count from database with filter %s.", queryExpression)
   return allCount, nil  
 }

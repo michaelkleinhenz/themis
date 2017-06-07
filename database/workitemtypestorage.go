@@ -91,7 +91,7 @@ func (WorkItemTypeStorage *WorkItemTypeStorage) GetAll(queryExpression interface
 		utils.ErrorLog.Printf("Error while retrieving all WorkItemTypes from database: %s", err.Error())
 		return nil, err
 	}
-	utils.DebugLog.Printf("Retrieved all WorkItemTypes from database.")
+	utils.DebugLog.Printf("Retrieved WorkItemTypes from database with filter %s.", queryExpression)
 	return *allWorkItemTypes, nil
 }
 
@@ -107,7 +107,7 @@ func (WorkItemTypeStorage *WorkItemTypeStorage) GetAllPaged(queryExpression inte
     utils.ErrorLog.Printf("Error while retrieving paged WorkItemTypes from database: %s", err.Error())
     return nil, err
 	}
-  utils.DebugLog.Printf("Retrieved paged WorkItemTypes from database.")  
+	utils.DebugLog.Printf("Retrieved paged WorkItemTypes from database with filter %s.", queryExpression)
   return *allWorkItemTypes, nil
 }
 
@@ -119,6 +119,7 @@ func (WorkItemTypeStorage *WorkItemTypeStorage) GetAllCount(queryExpression inte
     utils.ErrorLog.Printf("Error while retrieving number of WorkItemTypes from database: %s", err.Error())
     return -1, err
 	}
+	utils.DebugLog.Printf("Retrieved WorkItemTypes count from database with filter %s.", queryExpression)
   return allCount, nil  
 }
 

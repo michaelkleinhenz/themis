@@ -96,7 +96,7 @@ func (SpaceStorage *SpaceStorage) GetAll(queryExpression interface{}) ([]models.
 		utils.ErrorLog.Printf("Error while retrieving all Spaces from database: %s", err.Error())
 		return nil, err
 	}
-	utils.DebugLog.Printf("Retrieved all Spaces from database.")
+	utils.DebugLog.Printf("Retrieved Spaces from database with filter %s.", queryExpression)
 	return *allSpaces, nil
 }
 
@@ -112,7 +112,7 @@ func (SpaceStorage *SpaceStorage) GetAllPaged(queryExpression interface{}, offse
     utils.ErrorLog.Printf("Error while retrieving paged Spaces from database: %s", err.Error())
     return nil, err
 	}
-  utils.DebugLog.Printf("Retrieved paged Spaces from database.")  
+	utils.DebugLog.Printf("Retrieved paged Spaces from database with filter %s.", queryExpression)
   return *allSpaces, nil
 }
 
@@ -124,6 +124,7 @@ func (SpaceStorage *SpaceStorage) GetAllCount(queryExpression interface{}) (int,
     utils.ErrorLog.Printf("Error while retrieving number of Spaces from database: %s", err.Error())
     return -1, err
 	}
+	utils.DebugLog.Printf("Retrieved Spaces count from database with filter %s.", queryExpression)
   return allCount, nil  
 }
 

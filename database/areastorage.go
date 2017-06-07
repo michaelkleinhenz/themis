@@ -107,7 +107,7 @@ func (AreaStorage *AreaStorage) GetAll(queryExpression interface{}) ([]models.Ar
 		utils.ErrorLog.Printf("Error while retrieving all Areas from database: %s", err.Error())
 		return nil, err
 	}
-	utils.DebugLog.Printf("Retrieved all Areas from database.")
+	utils.DebugLog.Printf("Retrieved Areas from database with filter %s.", queryExpression)
 	return *allAreas, nil
 }
 
@@ -123,7 +123,7 @@ func (AreaStorage *AreaStorage) GetAllPaged(queryExpression interface{}, offset 
     utils.ErrorLog.Printf("Error while retrieving paged Areas from database: %s", err.Error())
     return nil, err
 	}
-  utils.DebugLog.Printf("Retrieved paged Areas from database.")  
+	utils.DebugLog.Printf("Retrieved Areas from database with filter %s.", queryExpression)
   return *allAreas, nil
 }
 
@@ -135,6 +135,7 @@ func (AreaStorage *AreaStorage) GetAllCount(queryExpression interface{}) (int, e
     utils.ErrorLog.Printf("Error while retrieving number of Areas from database: %s", err.Error())
     return -1, err
 	}
+	utils.DebugLog.Printf("Retrieved Areas count from database with filter %s.", queryExpression)
   return allCount, nil  
 }
 

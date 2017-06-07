@@ -112,7 +112,7 @@ func (IterationStorage *IterationStorage) GetAll(queryExpression interface{}) ([
 		utils.ErrorLog.Printf("Error while retrieving all Iterations from database: %s", err.Error())
 		return nil, err
 	}
-	utils.DebugLog.Printf("Retrieved all Iterations from database.")
+	utils.DebugLog.Printf("Retrieved Iterations from database with filter %s.", queryExpression)
 	return *allIterations, nil
 }
 
@@ -128,7 +128,7 @@ func (IterationStorage *IterationStorage) GetAllPaged(queryExpression interface{
     utils.ErrorLog.Printf("Error while retrieving paged Iterations from database: %s", err.Error())
     return nil, err
 	}
-  utils.DebugLog.Printf("Retrieved paged Iterations from database.")  
+	utils.DebugLog.Printf("Retrieved paged Iterations from database with filter %s.", queryExpression)
   return *allIterations, nil
 }
 
@@ -140,6 +140,7 @@ func (IterationStorage *IterationStorage) GetAllCount(queryExpression interface{
     utils.ErrorLog.Printf("Error while retrieving number of Iterations from database: %s", err.Error())
     return -1, err
 	}
+	utils.DebugLog.Printf("Retrieved Iterations count from database with filter %s.", queryExpression)
   return allCount, nil  
 }
 

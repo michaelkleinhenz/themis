@@ -91,7 +91,7 @@ func (LinkStorage *LinkStorage) GetAll(queryExpression interface{}) ([]models.Li
 		utils.ErrorLog.Printf("Error while retrieving all Links from database: %s", err.Error())
 		return nil, err
 	}
-	utils.DebugLog.Printf("Retrieved all Links from database.")
+	utils.DebugLog.Printf("Retrieved Links from database with filter %s.", queryExpression)
 	return *allLinks, nil
 }
 
@@ -107,7 +107,7 @@ func (LinkStorage *LinkStorage) GetAllPaged(queryExpression interface{}, offset 
     utils.ErrorLog.Printf("Error while retrieving paged Links from database: %s", err.Error())
     return nil, err
 	}
-  utils.DebugLog.Printf("Retrieved paged Links from database.")  
+	utils.DebugLog.Printf("Retrieved paged Links from database with filter %s.", queryExpression)
   return *allLinks, nil
 }
 
@@ -119,5 +119,6 @@ func (LinkStorage *LinkStorage) GetAllCount(queryExpression interface{}) (int, e
     utils.ErrorLog.Printf("Error while retrieving number of Links from database: %s", err.Error())
     return -1, err
 	}
+	utils.DebugLog.Printf("Retrieved Links count from database with filter %s.", queryExpression)
   return allCount, nil  
 }
