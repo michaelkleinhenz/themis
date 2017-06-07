@@ -52,7 +52,7 @@ func (SpaceStorage *SpaceStorage) Update(space models.Space) error {
 		utils.ErrorLog.Printf("Error while updating Space with ID %s in database: %s", space.ID, err.Error())
 		return err
 	}
-	utils.DebugLog.Printf("Updated Space with ID %s in database.", space.ID.String())
+	utils.DebugLog.Printf("Updated Space with ID %s in database.", space.ID.Hex())
 	return nil
 }
 
@@ -84,14 +84,14 @@ func (SpaceStorage *SpaceStorage) GetOne(id bson.ObjectId) (models.Space, error)
 		utils.ErrorLog.Printf("Error while retrieving Space with ID %s from database: %s", space.ID, err.Error())
 		return *space, err
 	}
-	utils.DebugLog.Printf("Retrieved Space with ID %s from database.", space.ID.String())
+	utils.DebugLog.Printf("Retrieved Space with ID %s from database.", space.ID.Hex())
 	return *space, nil
 }
 
 // GetAll returns an entity from the database based on a given ID.
 func (SpaceStorage *SpaceStorage) GetAll(queryExpression interface{}) ([]models.Space, error) {
 	allSpaces := new([]models.Space)
-	coll := SpaceStorage.database.C("spaces")
+	coll := SpaceStorage.database.C(new(models.Space).GetCollectionName())
 	if err := coll.Find(queryExpression).All(allSpaces); err != nil {
 		utils.ErrorLog.Printf("Error while retrieving all Spaces from database: %s", err.Error())
 		return nil, err
@@ -105,7 +105,7 @@ func (SpaceStorage *SpaceStorage) GetAllPaged(queryExpression interface{}, offse
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allSpaces := new([]models.Space)
-	coll := SpaceStorage.database.C("spaces")
+	coll := SpaceStorage.database.C(new(models.Space).GetCollectionName())
   query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allSpaces); err != nil { 
@@ -118,7 +118,7 @@ func (SpaceStorage *SpaceStorage) GetAllPaged(queryExpression interface{}, offse
 
 // GetAllCount returns the number of elements in the database.
 func (SpaceStorage *SpaceStorage) GetAllCount(queryExpression interface{}) (int, error) {
-	coll := SpaceStorage.database.C("spaces")
+	coll := SpaceStorage.database.C(new(models.Space).GetCollectionName())
   allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of Spaces from database: %s", err.Error())
@@ -129,7 +129,7 @@ func (SpaceStorage *SpaceStorage) GetAllCount(queryExpression interface{}) (int,
 
 // NewDisplayID creates a new human-readable id.
 func (SpaceStorage *SpaceStorage) NewDisplayID() (int, error) {
-	coll := SpaceStorage.database.C("spaces")
+	coll := SpaceStorage.database.C(new(models.Space).GetCollectionName())
 	allSpaces := new([]models.Iteration)
   err := coll.Find(nil).Sort("-display_id").Limit(1).All(allSpaces)
   if err != nil { 

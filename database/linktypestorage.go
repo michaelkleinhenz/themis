@@ -24,7 +24,7 @@ func NewLinkTypeStorage(database *mgo.Database) *LinkTypeStorage {
 func (LinkTypeStorage *LinkTypeStorage) Insert(linkType models.LinkType) (bson.ObjectId, error) {
 	coll := LinkTypeStorage.database.C(linkType.GetCollectionName())
 	if linkType.ID != "" {
-		utils.ErrorLog.Printf("Given LinkType instance already has an ID %s. Can not insert into database.\n", linkType.ID.String())
+		utils.ErrorLog.Printf("Given LinkType instance already has an ID %s. Can not insert into database.\n", linkType.ID.Hex())
 		return "", errors.New("Given LinkType instance already has an ID. Can not insert into database")
 	}
 	linkType.ID = bson.NewObjectId()
@@ -32,7 +32,7 @@ func (LinkTypeStorage *LinkTypeStorage) Insert(linkType models.LinkType) (bson.O
 		utils.ErrorLog.Printf("Error while inserting new LinkType with ID %s into database: %s", linkType.ID, err.Error())
 		return "", err
 	}
-	utils.DebugLog.Printf("Inserted new LinkType with ID %s into database.", linkType.ID.String())
+	utils.DebugLog.Printf("Inserted new LinkType with ID %s into database.", linkType.ID.Hex())
 	return linkType.ID, nil
 }
 
@@ -47,7 +47,7 @@ func (LinkTypeStorage *LinkTypeStorage) Update(linkType models.LinkType) error {
 		utils.ErrorLog.Printf("Error while updating LinkType with ID %s in database: %s", linkType.ID, err.Error())
 		return err
 	}
-	utils.DebugLog.Printf("Updated LinkType with ID %s in database.", linkType.ID.String())
+	utils.DebugLog.Printf("Updated LinkType with ID %s in database.", linkType.ID.Hex())
 	return nil
 }
 
@@ -79,7 +79,7 @@ func (LinkTypeStorage *LinkTypeStorage) GetOne(id bson.ObjectId) (models.LinkTyp
 		utils.ErrorLog.Printf("Error while retrieving LinkType with ID %s from database: %s", linkType.ID, err.Error())
 		return *linkType, err
 	}
-	utils.DebugLog.Printf("Retrieved LinkType with ID %s from database.", linkType.ID.String())
+	utils.DebugLog.Printf("Retrieved LinkType with ID %s from database.", linkType.ID.Hex())
 	return *linkType, nil
 }
 

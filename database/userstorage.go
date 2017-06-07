@@ -24,7 +24,7 @@ func NewUserStorage(database *mgo.Database) *UserStorage {
 func (UserStorage *UserStorage) Insert(user models.User) (bson.ObjectId, error) {
 	coll := UserStorage.database.C(user.GetCollectionName())
 	if user.ID != "" {
-		utils.ErrorLog.Printf("Given User instance already has an ID %s. Can not insert into database.\n", user.ID.String())
+		utils.ErrorLog.Printf("Given User instance already has an ID %s. Can not insert into database.\n", user.ID.Hex())
 		return "", errors.New("Given User instance already has an ID. Can not insert into database")
 	}
 	user.ID = bson.NewObjectId()
@@ -47,7 +47,7 @@ func (UserStorage *UserStorage) Update(user models.User) error {
 		utils.ErrorLog.Printf("Error while updating User with ID %s in database: %s", user.ID.Hex(), err.Error())
 		return err
 	}
-	utils.DebugLog.Printf("Updated User with ID %s in database.", user.ID.String())
+	utils.DebugLog.Printf("Updated User with ID %s in database.", user.ID.Hex())
 	return nil
 }
 
@@ -86,7 +86,7 @@ func (UserStorage *UserStorage) GetOne(id bson.ObjectId) (models.User, error) {
 // GetAll returns an entity from the database based on a given ID.
 func (UserStorage *UserStorage) GetAll(queryExpression interface{}) ([]models.User, error) {
 	allUsers := new([]models.User)
-	coll := UserStorage.database.C("users")
+	coll := UserStorage.database.C(new(models.User).GetCollectionName())
 	if err := coll.Find(queryExpression).All(allUsers); err != nil {
 		utils.ErrorLog.Printf("Error while retrieving all Users from database: %s", err.Error())
 		return nil, err
@@ -100,7 +100,7 @@ func (UserStorage *UserStorage) GetAllPaged(queryExpression interface{}, offset 
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allUsers := new([]models.User)
-	coll := UserStorage.database.C("users")
+	coll := UserStorage.database.C(new(models.User).GetCollectionName())
   query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allUsers); err != nil { 
@@ -113,7 +113,7 @@ func (UserStorage *UserStorage) GetAllPaged(queryExpression interface{}, offset 
 
 // GetAllCount returns the number of elements in the database.
 func (UserStorage *UserStorage) GetAllCount(queryExpression interface{}) (int, error) {
-	coll := UserStorage.database.C("users")
+	coll := UserStorage.database.C(new(models.User).GetCollectionName())
   allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of Users from database: %s", err.Error())

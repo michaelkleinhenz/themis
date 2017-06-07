@@ -17,7 +17,7 @@ type Space struct {
     Description 		string          `bson:"description" json:"description"`
     Version     		int             `bson:"version" json:"version"`
     CollaboratorIDs []bson.ObjectId	`bson:"collaborator_ids" json:"-"`
-    OwnerIDs 				[]bson.ObjectId	`bson:"owner_ids" json:"-"`
+    OwnerID 				bson.ObjectId		`bson:"owned-by" json:"-"`
 }
 
 // NewSpace creates a new Space instance.
@@ -82,12 +82,29 @@ func (space Space) GetReferences() []jsonapi.Reference {
 			Name: "workitemlinktypes",
 			IsNotLoaded: true, // omit the data field, only generate links
 		},
+		{
+			Type: "linkcategories",
+			Name: "workitemlinkcategories",
+			IsNotLoaded: true, // omit the data field, only generate links
+		},
+		{
+			Type: "identities",
+			Name: "owned-by",
+			IsNotLoaded: false, // omit the data field, only generate links
+		},
 	}
 }
 
 // GetReferencedIDs to satisfy the jsonapi.MarshalLinkedRelations interface
 func (space Space) GetReferencedIDs() []jsonapi.ReferenceID {
-	return nil
+	result := []jsonapi.ReferenceID{
+		jsonapi.ReferenceID{
+			ID:   space.OwnerID.Hex(),
+			Type: "identities",
+			Name: "owned-by",
+		},
+	}
+	return result
 }
 
 // GetCustomLinks returns the custom links, namely the self link.
@@ -96,7 +113,7 @@ func (space Space) GetCustomLinks(linkURL string) jsonapi.Links {
 		"self": jsonapi.Link { linkURL, nil, },
 		"workitemlinktypes": jsonapi.Link { linkURL + "/linktypes", nil, },
 		"workitemtypes": jsonapi.Link { linkURL + "/workitemtypes", nil, },
-		//TODO "workitemlinkcategories": jsonapi.Link { linkURL + "/workitemlinkcategories", nil, },
+		"workitemlinkcategories": jsonapi.Link { linkURL + "/workitemlinkcategories", nil, },
 		// TODO "filters": "https://xxx/api/filters",
 	}
 	/*

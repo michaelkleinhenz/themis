@@ -24,7 +24,7 @@ func NewLinkCategoryStorage(database *mgo.Database) *LinkCategoryStorage {
 func (LinkCategoryStorage *LinkCategoryStorage) Insert(linkCategory models.LinkCategory) (bson.ObjectId, error) {
 	coll := LinkCategoryStorage.database.C(linkCategory.GetCollectionName())
 	if linkCategory.ID != "" {
-		utils.ErrorLog.Printf("Given LinkCategory instance already has an ID %s. Can not insert into database.\n", linkCategory.ID.String())
+		utils.ErrorLog.Printf("Given LinkCategory instance already has an ID %s. Can not insert into database.\n", linkCategory.ID.Hex())
 		return "", errors.New("Given LinkCategory instance already has an ID. Can not insert into database")
 	}
 	linkCategory.ID = bson.NewObjectId()
@@ -32,7 +32,7 @@ func (LinkCategoryStorage *LinkCategoryStorage) Insert(linkCategory models.LinkC
 		utils.ErrorLog.Printf("Error while inserting new LinkCategory with ID %s into database: %s", linkCategory.ID, err.Error())
 		return "", err
 	}
-	utils.DebugLog.Printf("Inserted new LinkCategory with ID %s into database.", linkCategory.ID.String())
+	utils.DebugLog.Printf("Inserted new LinkCategory with ID %s into database.", linkCategory.ID.Hex())
 	return linkCategory.ID, nil
 }
 
@@ -47,7 +47,7 @@ func (LinkCategoryStorage *LinkCategoryStorage) Update(linkCategory models.LinkC
 		utils.ErrorLog.Printf("Error while updating LinkCategory with ID %s in database: %s", linkCategory.ID, err.Error())
 		return err
 	}
-	utils.DebugLog.Printf("Updated LinkCategory with ID %s in database.", linkCategory.ID.String())
+	utils.DebugLog.Printf("Updated LinkCategory with ID %s in database.", linkCategory.ID.Hex())
 	return nil
 }
 
@@ -79,14 +79,14 @@ func (LinkCategoryStorage *LinkCategoryStorage) GetOne(id bson.ObjectId) (models
 		utils.ErrorLog.Printf("Error while retrieving LinkCategory with ID %s from database: %s", linkCategory.ID, err.Error())
 		return *linkCategory, err
 	}
-	utils.DebugLog.Printf("Retrieved LinkCategory with ID %s from database.", linkCategory.ID.String())
+	utils.DebugLog.Printf("Retrieved LinkCategory with ID %s from database.", linkCategory.ID.Hex())
 	return *linkCategory, nil
 }
 
 // GetAll returns an entity from the database based on a given ID.
 func (LinkCategoryStorage *LinkCategoryStorage) GetAll(queryExpression interface{}) ([]models.LinkCategory, error) {
 	allLinkCategorys := new([]models.LinkCategory)
-	coll := LinkCategoryStorage.database.C("linkCategorys")
+	coll := LinkCategoryStorage.database.C(new(models.LinkCategory).GetCollectionName())
 	if err := coll.Find(queryExpression).All(allLinkCategorys); err != nil {
 		utils.ErrorLog.Printf("Error while retrieving all LinkCategorys from database: %s", err.Error())
 		return nil, err
@@ -100,7 +100,7 @@ func (LinkCategoryStorage *LinkCategoryStorage) GetAllPaged(queryExpression inte
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allLinkCategorys := new([]models.LinkCategory)
-	coll := LinkCategoryStorage.database.C("linkCategorys")
+	coll := LinkCategoryStorage.database.C(new(models.LinkCategory).GetCollectionName())
   query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allLinkCategorys); err != nil { 
@@ -113,7 +113,7 @@ func (LinkCategoryStorage *LinkCategoryStorage) GetAllPaged(queryExpression inte
 
 // GetAllCount returns the number of elements in the database.
 func (LinkCategoryStorage *LinkCategoryStorage) GetAllCount(queryExpression interface{}) (int, error) {
-	coll := LinkCategoryStorage.database.C("linkCategorys")
+	coll := LinkCategoryStorage.database.C(new(models.LinkCategory).GetCollectionName())
   allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of LinkCategorys from database: %s", err.Error())

@@ -24,7 +24,7 @@ func NewAreaStorage(database *mgo.Database) *AreaStorage {
 func (AreaStorage *AreaStorage) Insert(area models.Area) (bson.ObjectId, error) {
 	coll := AreaStorage.database.C(area.GetCollectionName())
 	if area.ID != "" {
-		utils.ErrorLog.Printf("Given Area instance already has an ID %s. Can not insert into database.\n", area.ID.String())
+		utils.ErrorLog.Printf("Given Area instance already has an ID %s. Can not insert into database.\n", area.ID.Hex())
 		return "", errors.New("Given Area instance already has an ID. Can not insert into database")
 	}
 	area.ID = bson.NewObjectId()
@@ -32,7 +32,7 @@ func (AreaStorage *AreaStorage) Insert(area models.Area) (bson.ObjectId, error) 
 		utils.ErrorLog.Printf("Error while inserting new Area with ID %s into database: %s", area.ID, err.Error())
 		return "", err
 	}
-	utils.DebugLog.Printf("Inserted new Area with ID %s into database.", area.ID.String())
+	utils.DebugLog.Printf("Inserted new Area with ID %s into database.", area.ID.Hex())
 	return area.ID, nil
 }
 
@@ -47,7 +47,7 @@ func (AreaStorage *AreaStorage) Update(area models.Area) error {
 		utils.ErrorLog.Printf("Error while updating Area with ID %s in database: %s", area.ID, err.Error())
 		return err
 	}
-	utils.DebugLog.Printf("Updated Area with ID %s in database.", area.ID.String())
+	utils.DebugLog.Printf("Updated Area with ID %s in database.", area.ID.Hex())
 	return nil
 }
 
@@ -79,14 +79,14 @@ func (AreaStorage *AreaStorage) GetOne(id bson.ObjectId) (models.Area, error) {
 		utils.ErrorLog.Printf("Error while retrieving Area with ID %s from database: %s", area.ID, err.Error())
 		return *area, err
 	}
-	utils.DebugLog.Printf("Retrieved Area with ID %s from database.", area.ID.String())
+	utils.DebugLog.Printf("Retrieved Area with ID %s from database.", area.ID.Hex())
 	return *area, nil
 }
 
 // GetAll returns an entity from the database based on a given ID.
 func (AreaStorage *AreaStorage) GetAll(queryExpression interface{}) ([]models.Area, error) {
 	allAreas := new([]models.Area)
-	coll := AreaStorage.database.C("areas")
+	coll := AreaStorage.database.C(new(models.Area).GetCollectionName())
 	if err := coll.Find(queryExpression).All(allAreas); err != nil {
 		utils.ErrorLog.Printf("Error while retrieving all Areas from database: %s", err.Error())
 		return nil, err
@@ -100,7 +100,7 @@ func (AreaStorage *AreaStorage) GetAllPaged(queryExpression interface{}, offset 
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allAreas := new([]models.Area)
-	coll := AreaStorage.database.C("areas")
+	coll := AreaStorage.database.C(new(models.Area).GetCollectionName())
   query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allAreas); err != nil { 
@@ -113,7 +113,7 @@ func (AreaStorage *AreaStorage) GetAllPaged(queryExpression interface{}, offset 
 
 // GetAllCount returns the number of elements in the database.
 func (AreaStorage *AreaStorage) GetAllCount(queryExpression interface{}) (int, error) {
-	coll := AreaStorage.database.C("areas")
+	coll := AreaStorage.database.C(new(models.Area).GetCollectionName())
   allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of Areas from database: %s", err.Error())

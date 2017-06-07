@@ -54,7 +54,7 @@ func (workItemStorage *WorkItemStorage) Update(workItem models.WorkItem) error {
     utils.ErrorLog.Printf("Error while updating WorkItem with ID %s in database: %s", workItem.ID, err.Error())
     return err
 	}
-  utils.DebugLog.Printf("Updated WorkItem with ID %s in database.", workItem.ID.String())
+  utils.DebugLog.Printf("Updated WorkItem with ID %s in database.", workItem.ID.Hex())
   return nil
 }
 
@@ -86,7 +86,7 @@ func (workItemStorage *WorkItemStorage) GetOne(id bson.ObjectId) (models.WorkIte
     utils.ErrorLog.Printf("Error while retrieving WorkItem with ID %s from database: %s", wItem.ID, err.Error())
     return *wItem, err
 	}
-  utils.DebugLog.Printf("Retrieved WorkItem with ID %s from database.", wItem.ID.String())  
+  utils.DebugLog.Printf("Retrieved WorkItem with ID %s from database.", wItem.ID.Hex())  
   return *wItem, nil
 }
 
@@ -97,7 +97,7 @@ func (workItemStorage *WorkItemStorage) GetOne(id bson.ObjectId) (models.WorkIte
 // `bson.M{"space": spaceID}`.
 func (workItemStorage *WorkItemStorage) GetAll(queryExpression interface{}) ([]models.WorkItem, error) {
   allWorkItems := new([]models.WorkItem)
-	coll := workItemStorage.database.C("workitems")
+	coll := workItemStorage.database.C(new(models.WorkItem).GetCollectionName())
   if err := coll.Find(queryExpression).All(allWorkItems); err != nil { 
     utils.ErrorLog.Printf("Error while retrieving all WorkItems from database: %s", err.Error())
     return nil, err
@@ -111,7 +111,7 @@ func (workItemStorage *WorkItemStorage) GetAllPaged(queryExpression interface{},
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allWorkItems := new([]models.WorkItem)
-	coll := workItemStorage.database.C("workitems")
+	coll := workItemStorage.database.C(new(models.WorkItem).GetCollectionName())
   query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allWorkItems); err != nil { 
@@ -124,7 +124,7 @@ func (workItemStorage *WorkItemStorage) GetAllPaged(queryExpression interface{},
 
 // GetAllCount returns the number of elements in the database.
 func (workItemStorage *WorkItemStorage) GetAllCount(queryExpression interface{}) (int, error) {
-	coll := workItemStorage.database.C("workitems")
+	coll := workItemStorage.database.C(new(models.WorkItem).GetCollectionName())
   allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of WorkItems from database: %s", err.Error())
@@ -135,7 +135,7 @@ func (workItemStorage *WorkItemStorage) GetAllCount(queryExpression interface{})
 
 // NewDisplayID creates a new human-readable id.
 func (workItemStorage *WorkItemStorage) NewDisplayID(spaceID string) (int, error) {
-	coll := workItemStorage.database.C("workitems")
+	coll := workItemStorage.database.C(new(models.WorkItem).GetCollectionName())
 	allWorkItems := new([]models.Iteration)
   err := coll.Find(bson.M{"space_id": bson.ObjectIdHex(spaceID)}).Sort("-display_id").Limit(1).All(allWorkItems)
   if err != nil { 

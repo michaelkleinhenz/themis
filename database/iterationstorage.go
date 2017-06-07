@@ -52,7 +52,7 @@ func (IterationStorage *IterationStorage) Update(iteration models.Iteration) err
 		utils.ErrorLog.Printf("Error while updating Iteration with ID %s in database: %s", iteration.ID, err.Error())
 		return err
 	}
-	utils.DebugLog.Printf("Updated Iteration with ID %s in database.", iteration.ID.String())
+	utils.DebugLog.Printf("Updated Iteration with ID %s in database.", iteration.ID.Hex())
 	return nil
 }
 
@@ -84,14 +84,14 @@ func (IterationStorage *IterationStorage) GetOne(id bson.ObjectId) (models.Itera
 		utils.ErrorLog.Printf("Error while retrieving Iteration with ID %s from database: %s", iteration.ID, err.Error())
 		return *iteration, err
 	}
-	utils.DebugLog.Printf("Retrieved Iteration with ID %s from database.", iteration.ID.String())
+	utils.DebugLog.Printf("Retrieved Iteration with ID %s from database.", iteration.ID.Hex())
 	return *iteration, nil
 }
 
 // GetAll returns an entity from the database based on a given ID.
 func (IterationStorage *IterationStorage) GetAll(queryExpression interface{}) ([]models.Iteration, error) {
 	allIterations := new([]models.Iteration)
-	coll := IterationStorage.database.C("iterations")
+	coll := IterationStorage.database.C(new(models.Iteration).GetCollectionName())
 	if err := coll.Find(queryExpression).All(allIterations); err != nil {
 		utils.ErrorLog.Printf("Error while retrieving all Iterations from database: %s", err.Error())
 		return nil, err
@@ -105,7 +105,7 @@ func (IterationStorage *IterationStorage) GetAllPaged(queryExpression interface{
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allIterations := new([]models.Iteration)
-	coll := IterationStorage.database.C("iterations")
+	coll := IterationStorage.database.C(new(models.Iteration).GetCollectionName())
   query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allIterations); err != nil { 
@@ -118,7 +118,7 @@ func (IterationStorage *IterationStorage) GetAllPaged(queryExpression interface{
 
 // GetAllCount returns the number of elements in the database.
 func (IterationStorage *IterationStorage) GetAllCount(queryExpression interface{}) (int, error) {
-	coll := IterationStorage.database.C("iterations")
+	coll := IterationStorage.database.C(new(models.Iteration).GetCollectionName())
   allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of Iterations from database: %s", err.Error())
@@ -129,7 +129,7 @@ func (IterationStorage *IterationStorage) GetAllCount(queryExpression interface{
 
 // NewDisplayID creates a new human-readable id.
 func (IterationStorage *IterationStorage) NewDisplayID(spaceID string) (int, error) {
-	coll := IterationStorage.database.C("iterations")
+	coll := IterationStorage.database.C(new(models.Iteration).GetCollectionName())
 	allIterations := new([]models.Iteration)
   err := coll.Find(bson.M{"space_id": bson.ObjectIdHex(spaceID)}).Sort("-display_id").Limit(1).All(allIterations)
   if err != nil { 

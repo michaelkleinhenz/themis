@@ -24,7 +24,7 @@ func NewCommentStorage(database *mgo.Database) *CommentStorage {
 func (CommentStorage *CommentStorage) Insert(comment models.Comment) (bson.ObjectId, error) {
 	coll := CommentStorage.database.C(comment.GetCollectionName())
 	if comment.ID != "" {
-		utils.ErrorLog.Printf("Given Comment instance already has an ID %s. Can not insert into database.\n", comment.ID.String())
+		utils.ErrorLog.Printf("Given Comment instance already has an ID %s. Can not insert into database.\n", comment.ID.Hex())
 		return "", errors.New("Given Comment instance already has an ID. Can not insert into database")
 	}
 	comment.ID = bson.NewObjectId()
@@ -32,7 +32,7 @@ func (CommentStorage *CommentStorage) Insert(comment models.Comment) (bson.Objec
 		utils.ErrorLog.Printf("Error while inserting new Comment with ID %s into database: %s", comment.ID, err.Error())
 		return "", err
 	}
-	utils.DebugLog.Printf("Inserted new Comment with ID %s into database.", comment.ID.String())
+	utils.DebugLog.Printf("Inserted new Comment with ID %s into database.", comment.ID.Hex())
 	return comment.ID, nil
 }
 
@@ -47,7 +47,7 @@ func (CommentStorage *CommentStorage) Update(comment models.Comment) error {
 		utils.ErrorLog.Printf("Error while updating Comment with ID %s in database: %s", comment.ID, err.Error())
 		return err
 	}
-	utils.DebugLog.Printf("Updated Comment with ID %s in database.", comment.ID.String())
+	utils.DebugLog.Printf("Updated Comment with ID %s in database.", comment.ID.Hex())
 	return nil
 }
 
@@ -79,14 +79,14 @@ func (CommentStorage *CommentStorage) GetOne(id bson.ObjectId) (models.Comment, 
 		utils.ErrorLog.Printf("Error while retrieving Comment with ID %s from database: %s", comment.ID, err.Error())
 		return *comment, err
 	}
-	utils.DebugLog.Printf("Retrieved Comment with ID %s from database.", comment.ID.String())
+	utils.DebugLog.Printf("Retrieved Comment with ID %s from database.", comment.ID.Hex())
 	return *comment, nil
 }
 
 // GetAll returns an entity from the database based on a given ID.
 func (CommentStorage *CommentStorage) GetAll(queryExpression interface{}) ([]models.Comment, error) {
 	allComments := new([]models.Comment)
-	coll := CommentStorage.database.C("comments")
+	coll := CommentStorage.database.C(new(models.Comment).GetCollectionName())
 	if err := coll.Find(queryExpression).All(allComments); err != nil {
 		utils.ErrorLog.Printf("Error while retrieving all Comments from database: %s", err.Error())
 		return nil, err
@@ -100,7 +100,7 @@ func (CommentStorage *CommentStorage) GetAllPaged(queryExpression interface{}, o
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allComments := new([]models.Comment)
-	coll := CommentStorage.database.C("Comments")
+	coll := CommentStorage.database.C(new(models.Comment).GetCollectionName())
   query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allComments); err != nil { 
@@ -113,7 +113,7 @@ func (CommentStorage *CommentStorage) GetAllPaged(queryExpression interface{}, o
 
 // GetAllCount returns the number of elements in the database.
 func (CommentStorage *CommentStorage) GetAllCount(queryExpression interface{}) (int, error) {
-	coll := CommentStorage.database.C("comments")
+	coll := CommentStorage.database.C(new(models.Comment).GetCollectionName())
   allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of Comments from database: %s", err.Error())

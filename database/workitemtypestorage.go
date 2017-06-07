@@ -24,7 +24,7 @@ func NewWorkItemTypeStorage(database *mgo.Database) *WorkItemTypeStorage {
 func (WorkItemTypeStorage *WorkItemTypeStorage) Insert(workItemType models.WorkItemType) (bson.ObjectId, error) {
 	coll := WorkItemTypeStorage.database.C(workItemType.GetCollectionName())
 	if workItemType.ID != "" {
-		utils.ErrorLog.Printf("Given WorkItemType instance already has an ID %s. Can not insert into database.\n", workItemType.ID.String())
+		utils.ErrorLog.Printf("Given WorkItemType instance already has an ID %s. Can not insert into database.\n", workItemType.ID.Hex())
 		return "", errors.New("Given WorkItemType instance already has an ID. Can not insert into database")
 	}
 	workItemType.ID = bson.NewObjectId()
@@ -32,7 +32,7 @@ func (WorkItemTypeStorage *WorkItemTypeStorage) Insert(workItemType models.WorkI
 		utils.ErrorLog.Printf("Error while inserting new WorkItemType with ID %s into database: %s", workItemType.ID, err.Error())
 		return "", err
 	}
-	utils.DebugLog.Printf("Inserted new WorkItemType with ID %s into database.", workItemType.ID.String())
+	utils.DebugLog.Printf("Inserted new WorkItemType with ID %s into database.", workItemType.ID.Hex())
 	return workItemType.ID, nil
 }
 
@@ -47,7 +47,7 @@ func (WorkItemTypeStorage *WorkItemTypeStorage) Update(workItemType models.WorkI
 		utils.ErrorLog.Printf("Error while updating WorkItemType with ID %s in database: %s", workItemType.ID, err.Error())
 		return err
 	}
-	utils.DebugLog.Printf("Updated WorkItemType with ID %s in database.", workItemType.ID.String())
+	utils.DebugLog.Printf("Updated WorkItemType with ID %s in database.", workItemType.ID.Hex())
 	return nil
 }
 
@@ -79,14 +79,14 @@ func (WorkItemTypeStorage *WorkItemTypeStorage) GetOne(id bson.ObjectId) (models
 		utils.ErrorLog.Printf("Error while retrieving WorkItemType with ID %s from database: %s", workItemType.ID, err.Error())
 		return *workItemType, err
 	}
-	utils.DebugLog.Printf("Retrieved WorkItemType with ID %s from database.", workItemType.ID.String())
+	utils.DebugLog.Printf("Retrieved WorkItemType with ID %s from database.", workItemType.ID.Hex())
 	return *workItemType, nil
 }
 
 // GetAll returns an entity from the database based on a given ID.
 func (WorkItemTypeStorage *WorkItemTypeStorage) GetAll(queryExpression interface{}) ([]models.WorkItemType, error) {
 	allWorkItemTypes := new([]models.WorkItemType)
-	coll := WorkItemTypeStorage.database.C("workitemtypes")
+	coll := WorkItemTypeStorage.database.C(new(models.WorkItemType).GetCollectionName())
 	if err := coll.Find(queryExpression).All(allWorkItemTypes); err != nil {
 		utils.ErrorLog.Printf("Error while retrieving all WorkItemTypes from database: %s", err.Error())
 		return nil, err
@@ -100,7 +100,7 @@ func (WorkItemTypeStorage *WorkItemTypeStorage) GetAllPaged(queryExpression inte
   // TODO there might be performance issues with this approach. See here:
   // https://stackoverflow.com/questions/40634865/efficient-paging-in-mongodb-using-mgo
   allWorkItemTypes := new([]models.WorkItemType)
-	coll := WorkItemTypeStorage.database.C("workitemtypes")
+	coll := WorkItemTypeStorage.database.C(new(models.WorkItemType).GetCollectionName())
   query := coll.Find(queryExpression).Sort("updated_at").Limit(limit)
   query = query.Skip(offset)
   if err := query.All(allWorkItemTypes); err != nil { 
@@ -113,7 +113,7 @@ func (WorkItemTypeStorage *WorkItemTypeStorage) GetAllPaged(queryExpression inte
 
 // GetAllCount returns the number of elements in the database.
 func (WorkItemTypeStorage *WorkItemTypeStorage) GetAllCount(queryExpression interface{}) (int, error) {
-	coll := WorkItemTypeStorage.database.C("workitemtypes")
+	coll := WorkItemTypeStorage.database.C(new(models.WorkItemType).GetCollectionName())
   allCount, err := coll.Find(queryExpression).Count()
   if err != nil { 
     utils.ErrorLog.Printf("Error while retrieving number of WorkItemTypes from database: %s", err.Error())

@@ -3,8 +3,6 @@ package schema
 import (
 	"strconv"
 
-	"gopkg.in/mgo.v2/bson"
-
 	"themis/database"
 	"themis/models"
 	"themis/utils"
@@ -24,7 +22,7 @@ func SetupFixtureData(storageBackends database.StorageBackends) string {
 	mockSpace := models.NewSpace()
 	mockSpace.Name = "Some Space Name"
 	mockSpace.Description = "Some Space Description"
-	mockSpace.OwnerIDs = []bson.ObjectId{mockUser.ID}
+	mockSpace.OwnerID = mockUser.ID
 	mockSpace.ID, _ = storageBackends.Space.Insert(*mockSpace)
 	utils.DebugLog.Printf("Created Mock Space with ID: %s\n", mockSpace.ID.Hex())
 
