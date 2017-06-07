@@ -15,12 +15,54 @@ import (
 // AreaResource for api2go routes.
 type AreaResource struct {
 	AreaStorage *database.AreaStorage
+	WorkItemStorage *database.WorkItemStorage
+}
+
+func (c AreaResource) getFilterFromRequest(r api2go.Request) (bson.M, *utils.NestedEntityError) {
+	var filter bson.M
+	// Getting reference context
+	sourceContext, sourceContextID, thisContext := utils.ParseContext(r)
+	switch sourceContext {
+		case models.AreaName:
+			entity, err := c.AreaStorage.GetOne(bson.ObjectIdHex(sourceContextID))
+			if (err != nil) {
+				return nil, &utils.NestedEntityError { InnerError: err, Code: 0 }
+			}
+			if thisContext == "parent" {
+				if entity.ParentAreaID.Hex()=="" {
+					// this is the root area
+					return nil, &utils.NestedEntityError { InnerError: nil, Code: 42 }
+				}
+				filter = bson.M{"_id": entity.ParentAreaID}
+			}
+		case models.WorkItemName:
+			entity, err := c.WorkItemStorage.GetOne(bson.ObjectIdHex(sourceContextID))
+			if (err != nil) {
+				return nil, &utils.NestedEntityError { InnerError: err, Code: 0 }
+			}
+			if thisContext == "area" {
+				filter = bson.M{"_id": entity.AreaID}
+			}
+		default:
+			// build standard filter expression
+			filter = (utils.BuildDbFilterFromRequest(r)).(bson.M)
+	}
+	return filter, nil
 }
 
 // FindAll Areas.
 func (c AreaResource) FindAll(r api2go.Request) (api2go.Responder, error) {
 	// build filter expression
-	var filter interface{} = utils.BuildDbFilterFromRequest(r)
+	filter, err := c.getFilterFromRequest(r)
+	if err != nil && err.Code==42 {
+		// this is the root area
+		var empty []models.Area
+		return &api2go.Response{Res: empty}, nil
+	}
+	if err != nil {
+		return &api2go.Response{}, err.InnerError
+	}
+
 	areas, _ := c.AreaStorage.GetAll(filter)
 	return &api2go.Response{Res: areas}, nil
 }
@@ -30,7 +72,15 @@ func (c AreaResource) FindAll(r api2go.Request) (api2go.Responder, error) {
 func (c AreaResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Responder, error) {
 
 	// build filter expression
-	var filter interface{} = utils.BuildDbFilterFromRequest(r)
+	filter, nestedErr := c.getFilterFromRequest(r)
+	if nestedErr != nil && nestedErr.Code==42 {
+		// this is the root area
+		var empty []models.Area
+		return 0, &api2go.Response{Res: empty}, nil
+	}
+	if nestedErr != nil {
+		return 0, &api2go.Response{}, nestedErr.InnerError
+	}
 
 	// parse out offset and limit
 	queryOffset, queryLimit, err := utils.ParsePaging(r)

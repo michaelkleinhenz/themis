@@ -41,6 +41,13 @@ func BuildDbFilterFromRequest(r api2go.Request) interface{} {
 		}
 		(filter.(bson.M))["workitem_id"] = workitemID
 	}
+	workitemsID, ok := GetPathParam(r, "workitemsID")
+	if ok {
+		if filter == nil {
+			filter = bson.M{}
+		}
+		(filter.(bson.M))["workitem_id"] = workitemsID
+	}
 	iterationsID, ok := GetPathParam(r, "iterationsID")
 	if ok {
 		if filter == nil {

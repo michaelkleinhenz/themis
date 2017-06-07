@@ -15,12 +15,37 @@ import (
 // WorkItemTypeResource for api2go routes.
 type WorkItemTypeResource struct {
 	WorkItemTypeStorage *database.WorkItemTypeStorage
+	WorkItemStorage *database.WorkItemStorage
+}
+
+func (c WorkItemTypeResource) getFilterFromRequest(r api2go.Request) (bson.M, error) {
+	var filter bson.M
+	// Getting reference context
+	// TODO: find a more elegant way, maybe using function literals.
+	sourceContext, sourceContextID, thisContext := utils.ParseContext(r)
+	switch sourceContext {
+		case models.WorkItemName:
+			workItem, err := c.WorkItemStorage.GetOne(bson.ObjectIdHex(sourceContextID))
+			if (err != nil) {
+				return nil, err
+			}
+			if thisContext == "baseType" {
+				filter = bson.M{"_id": workItem.BaseTypeID}
+			}
+		default:
+			// build standard filter expression
+			filter = (utils.BuildDbFilterFromRequest(r)).(bson.M)
+	}
+	return filter, nil
 }
 
 // FindAll WorkItemTypes.
 func (c WorkItemTypeResource) FindAll(r api2go.Request) (api2go.Responder, error) {
 	// build filter expression
-	var filter interface{} = utils.BuildDbFilterFromRequest(r)
+	filter, err := c.getFilterFromRequest(r)
+	if err != nil {
+		return &api2go.Response{}, err
+	}
 	workItemTypes, _ := c.WorkItemTypeStorage.GetAll(filter)
 	return &api2go.Response{Res: workItemTypes}, nil
 }
@@ -30,7 +55,10 @@ func (c WorkItemTypeResource) FindAll(r api2go.Request) (api2go.Responder, error
 func (c WorkItemTypeResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Responder, error) {
 
 	// build filter expression
-	var filter interface{} = utils.BuildDbFilterFromRequest(r)
+	filter, err := c.getFilterFromRequest(r)
+	if err != nil {
+		return 0, &api2go.Response{}, err
+	}
 
 	// parse out offset and limit
 	queryOffset, queryLimit, err := utils.ParsePaging(r)

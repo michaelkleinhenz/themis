@@ -16,23 +16,81 @@ import (
 type SpaceResource struct {
 	SpaceStorage *database.SpaceStorage
 	WorkItemTypeStorage *database.WorkItemTypeStorage
+	AreaStorage *database.AreaStorage
+
+	WorkItemStorage *database.WorkItemStorage
+	IterationStorage *database.IterationStorage
+	LinkCategoryStorage *database.LinkCategoryStorage
+	LinkStorage *database.LinkStorage
+	LinkTypeStorage *database.LinkTypeStorage
 }
 
 func (c SpaceResource) getFilterFromRequest(r api2go.Request) (bson.M, error) {
 	var filter bson.M
 	// Getting reference context
+	// TODO: find a more elegant way, maybe using function literals.
 	sourceContext, sourceContextID, thisContext := utils.ParseContext(r)
-	if (sourceContext == models.WorkItemTypeName) {
-		workItemType, err := c.WorkItemTypeStorage.GetOne(bson.ObjectIdHex(sourceContextID))
-		if (err != nil) {
-			return nil, err
-		}
-		if thisContext == "space" {
-			filter = bson.M{"_id": workItemType.SpaceID}
-		}
-	} else {
-		// build standard filter expression
-		filter = (utils.BuildDbFilterFromRequest(r)).(bson.M)
+	switch sourceContext {
+		case models.WorkItemTypeName:
+			entity, err := c.WorkItemTypeStorage.GetOne(bson.ObjectIdHex(sourceContextID))
+			if (err != nil) {
+				return nil, err
+			}
+			// TODO find out why "spaces" on the WorkItemType and "space" on the area.
+			if thisContext == "space" || thisContext == "spaces" {
+				filter = bson.M{"_id": entity.SpaceID}
+			}
+		case models.AreaName:
+			entity, err := c.AreaStorage.GetOne(bson.ObjectIdHex(sourceContextID))
+			if (err != nil) {
+				return nil, err
+			}
+			if thisContext == "space" || thisContext == "spaces" {
+				filter = bson.M{"_id": entity.SpaceID}
+			}
+		case models.WorkItemName:
+			entity, err := c.WorkItemStorage.GetOne(bson.ObjectIdHex(sourceContextID))
+			if (err != nil) {
+				return nil, err
+			}
+			if thisContext == "space" || thisContext == "spaces" {
+				filter = bson.M{"_id": entity.SpaceID}
+			}
+		case models.IterationName:
+			entity, err := c.IterationStorage.GetOne(bson.ObjectIdHex(sourceContextID))
+			if (err != nil) {
+				return nil, err
+			}
+			if thisContext == "space" || thisContext == "spaces" {
+				filter = bson.M{"_id": entity.SpaceID}
+			}
+		case models.LinkCategoryName:
+			entity, err := c.LinkCategoryStorage.GetOne(bson.ObjectIdHex(sourceContextID))
+			if (err != nil) {
+				return nil, err
+			}
+			if thisContext == "space" || thisContext == "spaces" {
+				filter = bson.M{"_id": entity.SpaceID}
+			}
+		case models.LinkTypeName:
+			entity, err := c.LinkTypeStorage.GetOne(bson.ObjectIdHex(sourceContextID))
+			if (err != nil) {
+				return nil, err
+			}
+			if thisContext == "space" || thisContext == "spaces" {
+				filter = bson.M{"_id": entity.SpaceID}
+			}
+		case models.LinkName:
+			entity, err := c.LinkStorage.GetOne(bson.ObjectIdHex(sourceContextID))
+			if (err != nil) {
+				return nil, err
+			}
+			if thisContext == "space" || thisContext == "spaces" {
+				filter = bson.M{"_id": entity.SpaceID}
+			}
+		default:
+			// build standard filter expression
+			filter = (utils.BuildDbFilterFromRequest(r)).(bson.M)
 	}
 	return filter, nil
 }

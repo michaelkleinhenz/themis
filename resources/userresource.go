@@ -16,25 +16,40 @@ import (
 type UserResource struct {
 	UserStorage *database.UserStorage
 	SpaceStorage *database.SpaceStorage
+	WorkItemStorage *database.WorkItemStorage
 }
 
 func (c UserResource) getFilterFromRequest(r api2go.Request) (bson.M, error) {
 	var filter bson.M
 	// Getting reference context
+	// TODO: find a more elegant way, maybe using function literals.
 	sourceContext, sourceContextID, thisContext := utils.ParseContext(r)
-	// context: space/owned-by, returns "spaces", "owned-by", spaceID
-	// TODO: we may want to replace that NewXX().GetCollectionName() with constants.
-	if (sourceContext == models.NewSpace().GetCollectionName()) {
-		space, err := c.SpaceStorage.GetOne(bson.ObjectIdHex(sourceContextID))
-		if (err != nil) {
-			return nil, err
-		}
-		if thisContext == "owned-by" {
-			filter = bson.M{"_id": space.OwnerID}
-		}
-	} else {
-		// build standard filter expression
-		filter = (utils.BuildDbFilterFromRequest(r)).(bson.M)
+	switch sourceContext {
+		case models.SpaceName:
+			space, err := c.SpaceStorage.GetOne(bson.ObjectIdHex(sourceContextID))
+			if (err != nil) {
+				return nil, err
+			}
+			if thisContext == "owned-by" {
+				filter = bson.M{"_id": space.OwnerID}
+			}
+			if thisContext == "collaborators" {
+				filter = bson.M{"_id": bson.M{"$in":space.CollaboratorIDs}}
+			}
+		case models.WorkItemName:
+			workItem, err := c.WorkItemStorage.GetOne(bson.ObjectIdHex(sourceContextID))
+			if (err != nil) {
+				return nil, err
+			}
+			if thisContext == "creator" {
+				filter = bson.M{"_id": workItem.CreatorID}
+			}
+			if thisContext == "assignees" {
+				filter = bson.M{"_id": bson.M{"$in":workItem.Assignees}}
+			}
+		default:
+			// build standard filter expression
+			filter = (utils.BuildDbFilterFromRequest(r)).(bson.M)
 	}
 	return filter, nil
 }

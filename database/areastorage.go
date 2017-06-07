@@ -20,6 +20,22 @@ func NewAreaStorage(database *mgo.Database) *AreaStorage {
 	return &AreaStorage{database: database}
 }
 
+// IsRoot returns true if the entity is the root entity
+func (AreaStorage *AreaStorage) IsRoot(id bson.ObjectId) (bool, error) {
+	area := new(models.Area)
+	coll := AreaStorage.database.C(area.GetCollectionName())
+	if id == "" {
+		utils.ErrorLog.Println("Given Area id is empty.")
+		return false, errors.New("Given Area id is empty")
+	}
+	if err := coll.Find(bson.M{"_id": id}).One(area); err != nil {
+		utils.ErrorLog.Printf("Error while retrieving Area with ID %s from database: %s", area.ID, err.Error())
+		return false, err
+	}
+	utils.DebugLog.Printf("Retrieved Area with ID %s from database.", area.ID.Hex())
+	return (area.ParentAreaID.Hex()==""), nil
+}
+
 // Insert creates a new record in the database and returns the new ID.
 func (AreaStorage *AreaStorage) Insert(area models.Area) (bson.ObjectId, error) {
 	coll := AreaStorage.database.C(area.GetCollectionName())

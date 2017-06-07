@@ -28,7 +28,7 @@ type Iteration struct {
 	CreatedAt          time.Time     `bson:"created_at" json:"created-at"`
 	UpdatedAt          time.Time     `bson:"updated_at" json:"-"`
 	ParentIterationID  bson.ObjectId `bson:"parent_iteration_id,omitempty" json:"-"`
-	SpaceID            bson.ObjectId `bson:"space_id" json:"-"`
+	SpaceID            bson.ObjectId `bson:"space_id,omitempty" json:"-"`
 }
 
 // NewIteration creates a new Iteration instance.

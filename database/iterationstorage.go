@@ -20,6 +20,22 @@ func NewIterationStorage(database *mgo.Database) *IterationStorage {
 	return &IterationStorage{database: database}
 }
 
+// IsRoot returns true if the entity is the root entity
+func (IterationStorage *IterationStorage) IsRoot(id bson.ObjectId) (bool, error) {
+	iteration := new(models.Iteration)
+	coll := IterationStorage.database.C(iteration.GetCollectionName())
+	if id == "" {
+		utils.ErrorLog.Println("Given Iteration id is empty.")
+		return false, errors.New("Given Iteration id is empty")
+	}
+	if err := coll.Find(bson.M{"_id": id}).One(iteration); err != nil {
+		utils.ErrorLog.Printf("Error while retrieving Iteration with ID %s from database: %s", iteration.ID, err.Error())
+		return false, err
+	}
+	utils.DebugLog.Printf("Retrieved Iteration with ID %s from database.", iteration.ID.Hex())
+	return (iteration.ParentIterationID.Hex()==""), nil
+}
+
 // Insert creates a new record in the database and returns the new ID.
 func (IterationStorage *IterationStorage) Insert(iteration models.Iteration) (bson.ObjectId, error) {
 	coll := IterationStorage.database.C(iteration.GetCollectionName())

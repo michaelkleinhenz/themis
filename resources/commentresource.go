@@ -17,10 +17,26 @@ type CommentResource struct {
 	CommentStorage *database.CommentStorage
 }
 
+func (c CommentResource) getFilterFromRequest(r api2go.Request) (bson.M, error) {
+	var filter bson.M
+	// Getting reference context
+	sourceContext, sourceContextID, thisContext := utils.ParseContext(r)
+	switch sourceContext {
+		case models.WorkItemName:
+			if thisContext == "comments" {
+				filter = bson.M{"workitem_id": bson.ObjectIdHex(sourceContextID)}
+			}
+		default:
+			// build standard filter expression
+			filter = (utils.BuildDbFilterFromRequest(r)).(bson.M)
+	}
+	return filter, nil
+}
+
 // FindAll Comments.
 func (c CommentResource) FindAll(r api2go.Request) (api2go.Responder, error) {
 	// build filter expression
-	var filter interface{} = utils.BuildDbFilterFromRequest(r)
+	filter, _ := c.getFilterFromRequest(r)
 	comments, _ := c.CommentStorage.GetAll(filter)
 	return &api2go.Response{Res: comments}, nil
 }
@@ -30,7 +46,7 @@ func (c CommentResource) FindAll(r api2go.Request) (api2go.Responder, error) {
 func (c CommentResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Responder, error) {
 
 	// build filter expression
-	var filter interface{} = utils.BuildDbFilterFromRequest(r)
+	filter, _ := c.getFilterFromRequest(r)
 
 	// parse out offset and limit
 	queryOffset, queryLimit, err := utils.ParsePaging(r)
