@@ -15,12 +15,36 @@ import (
 // LinkCategoryResource for api2go routes.
 type LinkCategoryResource struct {
 	LinkCategoryStorage *database.LinkCategoryStorage
+	LinkTypeStorage *database.LinkTypeStorage
+}
+
+func (c LinkCategoryResource) getFilterFromRequest(r api2go.Request) (bson.M, error) {
+	var filter bson.M
+	// Getting reference context
+	sourceContext, sourceContextID, thisContext := utils.ParseContext(r)
+	switch sourceContext {
+		case models.LinkTypeName:
+			linkType, err := c.LinkTypeStorage.GetOne(bson.ObjectIdHex(sourceContextID))
+			if (err != nil) {
+				return nil, err
+			}
+			if thisContext == "link_category" {
+				filter = bson.M{"_id": linkType.LinkCategoryID}
+			}
+		default:
+			// build standard filter expression
+			filter = (utils.BuildDbFilterFromRequest(r)).(bson.M)
+	}
+	return filter, nil
 }
 
 // FindAll LinkCategorys.
 func (c LinkCategoryResource) FindAll(r api2go.Request) (api2go.Responder, error) {
 	// build filter expression
-	var filter interface{} = utils.BuildDbFilterFromRequest(r)
+	filter, err := c.getFilterFromRequest(r)
+	if err != nil {
+		return &api2go.Response{}, err
+	}
 	linkCategorys, _ := c.LinkCategoryStorage.GetAll(filter)
 	return &api2go.Response{Res: linkCategorys}, nil
 }
@@ -30,7 +54,10 @@ func (c LinkCategoryResource) FindAll(r api2go.Request) (api2go.Responder, error
 func (c LinkCategoryResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Responder, error) {
 
 	// build filter expression
-	var filter interface{} = utils.BuildDbFilterFromRequest(r)
+	filter, err := c.getFilterFromRequest(r)
+	if err!=nil {
+		return 0, &api2go.Response{}, err
+	}
 
 	// parse out offset and limit
 	queryOffset, queryLimit, err := utils.ParsePaging(r)

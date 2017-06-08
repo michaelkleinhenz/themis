@@ -17,12 +17,42 @@ type WorkItemResource struct {
 	WorkItemStorage *database.WorkItemStorage
 }
 
+func (c WorkItemResource) getFilterFromRequest(r api2go.Request) (bson.M, *utils.NestedEntityError) {
+	var filter bson.M
+	// Getting reference context
+	sourceContext, sourceContextID, thisContext := utils.ParseContext(r)
+	switch sourceContext {
+		case models.WorkItemName:
+			if thisContext == "children" {
+				// we need the full children IDs here, so only query for the IDs, not the full documents!
+				// (Otherwise, we might kill the service as child lists can get big).
+				// Note that the empty selector automatically returns only the _id field.
+				childrens, err := c.WorkItemStorage.GetAll(bson.M{"parent_workitem_id": bson.ObjectIdHex(sourceContextID)})
+				if (err != nil) {
+					return nil, &utils.NestedEntityError { InnerError: err, Code: 0 }
+				}
+				childIDs := make([]bson.ObjectId, 0)
+				for _, children := range childrens {
+					childIDs = append(childIDs, children.ID)
+				}
+				filter = bson.M{"_id": bson.M{"$in": childIDs}}
+			}
+		default:
+			// build standard filter expression
+			filter = (utils.BuildDbFilterFromRequest(r)).(bson.M)
+	}
+	return filter, nil
+}
+
 // FindAll WorkItems.
 func (c WorkItemResource) FindAll(r api2go.Request) (api2go.Responder, error) {
 	utils.DebugLog.Printf("Received FindAll with params %s.", r.QueryParams)
 
 	// build filter expression
-	var filter interface{} = utils.BuildDbFilterFromRequest(r)
+	filter, nestedErr := c.getFilterFromRequest(r)
+	if nestedErr != nil {
+		return &api2go.Response{}, nestedErr.InnerError
+	}
 
 	// retrieve entities
 	workItems, err := c.WorkItemStorage.GetAll(filter)	
@@ -42,7 +72,10 @@ func (c WorkItemResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Respo
 	}
 
 	// build filter expression
-	var filter interface{} = utils.BuildDbFilterFromRequest(r)
+	filter, nestedErr := c.getFilterFromRequest(r)
+	if nestedErr.InnerError != nil {
+		return 0, &api2go.Response{}, nestedErr.InnerError
+	}
 
 	// get the paged data from storage
 	result, err := c.WorkItemStorage.GetAllPaged(filter, queryOffset, queryLimit)

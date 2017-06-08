@@ -6,6 +6,8 @@ import (
 
 	"github.com/manyminds/api2go/jsonapi"
 	"gopkg.in/mgo.v2/bson"
+
+	"themis/utils"
 )
 
 // WorkItemName stores the common type name.
@@ -108,6 +110,16 @@ func (workItem WorkItem) GetReferences() []jsonapi.Reference {
 			Name:        "space",
 			IsNotLoaded: false, // we want to have the data field
 		},
+		{
+			Type:        "workitemtypes",
+			Name:        "source-link-types",
+			IsNotLoaded: true, // we do not want to have the data field
+		},
+		{
+			Type:        "workitemtypes",
+			Name:        "target-link-types",
+			IsNotLoaded: true, // we do not want to have the data field
+		},
 	}
 }
 
@@ -154,12 +166,20 @@ func (workItem WorkItem) GetReferencedIDs() []jsonapi.ReferenceID {
 func (workItem WorkItem) GetCustomLinks(linkURL string) jsonapi.Links {
 	links := jsonapi.Links {
 		"self": jsonapi.Link { linkURL, nil, },
-		"sourceLinkTypes": jsonapi.Link { "TODO", nil, },
-		"targetLinkTypes": jsonapi.Link { "TODO", nil, },
+		"sourceLinkTypes": jsonapi.Link { linkURL + "/source-link-types", nil, },
+		"targetLinkTypes": jsonapi.Link { linkURL + "/target-link-types", nil, },
 	}
-	/* TODO:
-		"sourceLinkTypes": "https://xxx/api/spaces/xxSpaceId/workitemtypes/xxTypeId/source-link-types",
-		"targetLinkTypes": "https://xxx/api/spaces/xxSpaceId/workitemtypes/xxTypeId/target-link-types"
-	*/
 	return links
+}
+
+// GetCustomMeta returns the custom meta.
+// TODO this looks like it is being called 10 times for each serialization. Check why!
+func (workItem WorkItem) GetCustomMeta(linkURL string) jsonapi.Metas {
+	hasChildren, _ := utils.DatabaseMetaService.HasChildren(workItem.GetCollectionName(), workItem.ID)
+	meta := map[string]map[string]interface{} {
+		"children": map[string]interface{} {
+			"hasChildren": hasChildren,
+		},
+	}
+	return meta
 }

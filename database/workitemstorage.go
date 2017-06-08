@@ -34,11 +34,13 @@ func (workItemStorage *WorkItemStorage) Insert(workItem models.WorkItem) (bson.O
 	if err != nil {
 		return "", err
 	}
+  utils.ReplaceDotsToDollarsInAttributes(&workItem.Attributes)
   if err = coll.Insert(workItem); err != nil {
     utils.ErrorLog.Printf("Error while inserting new WorkItem with ID %s into database: %s", workItem.ID, err.Error())
     return "", err
   }
   utils.DebugLog.Printf("Inserted new WorkItem with ID %s and display_id %d into database.", workItem.ID.Hex(), workItem.DisplayID)
+  utils.ReplaceDollarsToDotsInAttributes(&workItem.Attributes)
   return workItem.ID, nil
 }
 
@@ -50,10 +52,12 @@ func (workItemStorage *WorkItemStorage) Update(workItem models.WorkItem) error {
     utils.ErrorLog.Println("Given WorkItem instance has an empty ID. Can not be updated in the database.")
     return errors.New("Given WorkItem instance has an empty ID. Can not be updated in the database")
   } 
+  utils.ReplaceDotsToDollarsInAttributes(&workItem.Attributes)
 	if err := coll.UpdateId(workItem.ID, workItem); err != nil {
     utils.ErrorLog.Printf("Error while updating WorkItem with ID %s in database: %s", workItem.ID, err.Error())
     return err
 	}
+  utils.ReplaceDollarsToDotsInAttributes(&workItem.Attributes)
   utils.DebugLog.Printf("Updated WorkItem with ID %s in database.", workItem.ID.Hex())
   return nil
 }
@@ -86,6 +90,7 @@ func (workItemStorage *WorkItemStorage) GetOne(id bson.ObjectId) (models.WorkIte
     utils.ErrorLog.Printf("Error while retrieving WorkItem with ID %s from database: %s", wItem.ID, err.Error())
     return *wItem, err
 	}
+  utils.ReplaceDollarsToDotsInAttributes(&wItem.Attributes)
   utils.DebugLog.Printf("Retrieved WorkItem with ID %s from database.", wItem.ID.Hex())  
   return *wItem, nil
 }
@@ -102,8 +107,23 @@ func (workItemStorage *WorkItemStorage) GetAll(queryExpression interface{}) ([]m
     utils.ErrorLog.Printf("Error while retrieving all WorkItems from database: %s", err.Error())
     return nil, err
 	}
+  for _, thisWorkItem := range *allWorkItems {
+    utils.ReplaceDollarsToDotsInAttributes(&(thisWorkItem.Attributes))
+  }
 	utils.DebugLog.Printf("Retrieved WorkItems from database with filter %s.", queryExpression)
   return *allWorkItems, nil
+}
+
+// GetAllChildIDs returns all child IDs for the given WorkItem ID.
+func (workItemStorage *WorkItemStorage) GetAllChildIDs(id bson.ObjectId) ([]bson.ObjectId, error) {
+  childrenIDs := new([]bson.ObjectId)
+	coll := workItemStorage.database.C(models.WorkItemName)
+  if err := coll.Find(bson.M{"parent_workitem_id": id}).Select(bson.M{}).All(childrenIDs); err != nil { 
+    utils.ErrorLog.Printf("Error while retrieving child IDs from database: %s", err.Error())
+    return nil, err
+	}
+	utils.DebugLog.Printf("Retrieved WorkItem child IDs from database for parent WorkItem %s.", id)
+  return *childrenIDs, nil
 }
 
 // GetAllPaged returns a subset of the work items based on offset and limit.
@@ -118,6 +138,9 @@ func (workItemStorage *WorkItemStorage) GetAllPaged(queryExpression interface{},
     utils.ErrorLog.Printf("Error while retrieving paged WorkItems from database: %s", err.Error())
     return nil, err
 	}
+  for _, thisWorkItem := range *allWorkItems {
+    utils.ReplaceDollarsToDotsInAttributes(&(thisWorkItem.Attributes))
+  }
 	utils.DebugLog.Printf("Retrieved paged WorkItems from database with filter %s.", queryExpression)
   return *allWorkItems, nil
 }

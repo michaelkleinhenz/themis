@@ -16,12 +16,12 @@ import (
 type WorkItemTypeResource struct {
 	WorkItemTypeStorage *database.WorkItemTypeStorage
 	WorkItemStorage *database.WorkItemStorage
+	LinkTypeStorage *database.LinkTypeStorage
 }
 
 func (c WorkItemTypeResource) getFilterFromRequest(r api2go.Request) (bson.M, error) {
 	var filter bson.M
 	// Getting reference context
-	// TODO: find a more elegant way, maybe using function literals.
 	sourceContext, sourceContextID, thisContext := utils.ParseContext(r)
 	switch sourceContext {
 		case models.WorkItemName:
@@ -31,6 +31,47 @@ func (c WorkItemTypeResource) getFilterFromRequest(r api2go.Request) (bson.M, er
 			}
 			if thisContext == "baseType" {
 				filter = bson.M{"_id": workItem.BaseTypeID}
+			}
+			if thisContext == "source-link-types" {
+				typeIDs := make([]bson.ObjectId, 0)
+				localTypeID := workItem.BaseTypeID
+				// get LinkTypes where this WIT is in TargetWorkItemTypeID
+				linkTypes, err := c.LinkTypeStorage.GetAll(bson.M{"target_workitemtype_id": localTypeID})
+				if (err != nil) {
+					return nil, err
+				}
+				// add SourceWorkItemTypeID of that type to the result list
+				for _, thisLinkType := range linkTypes {
+					typeIDs = append(typeIDs, thisLinkType.SourceWorkItemTypeID)
+				}
+				// return filter containing all returned ids
+				filter = bson.M{"_id": bson.M{ "$in": typeIDs }}
+			}
+			if thisContext == "target-link-types" {
+				typeIDs := make([]bson.ObjectId, 0)
+				localTypeID := workItem.BaseTypeID
+				// get LinkTypes where this WIT is in SourceWorkItemTypeID
+				linkTypes, err := c.LinkTypeStorage.GetAll(bson.M{"source_workitemtype_id": localTypeID})
+				if (err != nil) {
+					return nil, err
+				}
+				// add SourceWorkItemTypeID of that type to the result list
+				for _, thisLinkType := range linkTypes {
+					typeIDs = append(typeIDs, thisLinkType.TargetWorkItemTypeID)
+				}
+				// return filter containing all returned ids
+				filter = bson.M{"_id": bson.M{ "$in": typeIDs }}
+			}
+		case models.LinkTypeName:
+			linkType, err := c.LinkTypeStorage.GetOne(bson.ObjectIdHex(sourceContextID))
+			if (err != nil) {
+				return nil, err
+			}
+			if thisContext == "source_type" {
+				filter = bson.M{"_id": linkType.SourceWorkItemTypeID}
+			}
+			if thisContext == "target_type" {
+				filter = bson.M{"_id": linkType.TargetWorkItemTypeID}
 			}
 		default:
 			// build standard filter expression

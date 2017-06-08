@@ -131,16 +131,6 @@ func (space Space) GetCustomLinks(linkURL string) jsonapi.Links {
 	return links
 }
 
-// GetCustomMeta returns the custom meta.
-func (space Space) GetCustomMeta(linkURL string) jsonapi.Metas {
-	meta := map[string]map[string]interface{} {
-		"workitems": map[string]interface{} {
-			"someMetaKey": "someMetaValue",
-		},
-	}
-	return meta
-}
-
 // SetToOneReferenceID unmarshals toOne relationships.
 func (space Space) SetToOneReferenceID(name, ID string) error {
 	return nil

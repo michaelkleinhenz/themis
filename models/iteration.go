@@ -9,6 +9,8 @@ import (
 
 	"github.com/manyminds/api2go/jsonapi"
 	"gopkg.in/mgo.v2/bson"
+
+	"themis/utils"
 )
 
 // IterationName stores the common type name.
@@ -104,4 +106,17 @@ func (iteration Iteration) GetCustomLinks(linkURL string) jsonapi.Links {
 		"self": jsonapi.Link { linkURL, nil, },
 	}
 	return links
+}
+
+// GetCustomMeta returns the custom meta.
+// TODO this looks like it is being called 10 times for each serialization. Check why!
+func (iteration Iteration) GetCustomMeta(linkURL string) jsonapi.Metas {
+	totalWIs, closedWIs, _ := utils.DatabaseMetaService.GetIterationMeta(WorkItemName, iteration.ID)
+	meta := map[string]map[string]interface{} {
+		"workitems": map[string]interface{} {
+			"closed": closedWIs,
+			"total": totalWIs,
+		},
+	}
+	return meta
 }

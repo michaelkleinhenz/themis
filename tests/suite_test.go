@@ -67,6 +67,8 @@ var _ = BeforeSuite(func() {
 		LinkType: database.NewLinkTypeStorage(db),
 		User: database.NewUserStorage(db),
 	}
+	// Create the meta storage backend
+	utils.NewDatabaseMeta(db)
 	// setup test fixtures
 	SpaceID = schema.SetupFixtureData(storageBackends)
 	// launch service

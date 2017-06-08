@@ -8,6 +8,24 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// ReplaceDotsToDollarsInAttributes replaces "." with "$" because MongoDB sucks.
+func ReplaceDotsToDollarsInAttributes(attributes *map[string]string) {
+	for k, v := range *attributes { 
+		newK := strings.Replace(k, ".", "$", -1)
+		(*attributes)[newK] = v
+		delete(*attributes, k)
+	}
+}
+
+// ReplaceDollarsToDotsInAttributes replaces "$" with "." because MongoDB sucks.
+func ReplaceDollarsToDotsInAttributes(attributes *map[string]string) {
+	for k, v := range *attributes { 
+		newK := strings.Replace(k, "$", ".", -1)
+		(*attributes)[newK] = v
+		delete(*attributes, k)
+	}
+}
+
 // ParseContext parses a possible subquery context, returning the parsed context keys.
 // Example:
 //   http://localhost:8080/api/workitemtypes/abc123/space has a QueryParams map:
