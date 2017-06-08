@@ -44,9 +44,9 @@ func (d *DatabaseMeta) HasChildren(collectionName string, workItemID bson.Object
 // getIterationMeta returns iteration meta data.
 func (d *DatabaseMeta) GetIterationMeta(collectionName string, iterationID bson.ObjectId) (int, int, error) {
 	coll := d.database.C(collectionName)
-	countAll, err := coll.Find(bson.M{"IterationID": iterationID}).Count()
+	countAll, err := coll.Find(bson.M{"iteration_id": iterationID}).Count()
 	// TODO this uses a fixed "closed" state, that may change in the future.
-	countClosed, err := coll.Find(bson.M{"IterationID": iterationID, "Attributes.system$state": "closed"}).Count()
+	countClosed, err := coll.Find(bson.M{"iteration_id": iterationID, "attributes.system$state": "closed"}).Count()
   if err != nil { 
     ErrorLog.Printf("Error while retrieving Iteration/WorkItem meta counts from database: %s", err.Error())
     return -1, -1, err

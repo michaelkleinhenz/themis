@@ -28,7 +28,7 @@ func (c CommentResource) getFilterFromRequest(r api2go.Request) (bson.M, error) 
 			}
 		default:
 			// build standard filter expression
-			filter = (utils.BuildDbFilterFromRequest(r)).(bson.M)
+			filter = utils.BuildDbFilterFromRequest(r)
 	}
 	return filter, nil
 }

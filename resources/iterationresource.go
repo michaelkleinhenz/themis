@@ -45,7 +45,7 @@ func (c IterationResource) getFilterFromRequest(r api2go.Request) (bson.M, *util
 			}
 		default:
 			// build standard filter expression
-			filter = (utils.BuildDbFilterFromRequest(r)).(bson.M)
+			filter = utils.BuildDbFilterFromRequest(r)
 	}
 	return filter, nil
 }

@@ -46,8 +46,8 @@ func ParseContext(r api2go.Request) (sourceContext string, sourceContextID strin
 }
 
 // BuildDbFilterFromRequest builds the filter structure from the request.
-func BuildDbFilterFromRequest(r api2go.Request) interface{} {
-	var filter interface{}
+func BuildDbFilterFromRequest(r api2go.Request) bson.M {
+	var filter bson.M
 	spaceID, ok := GetPathParam(r, "spacesID")
 	if ok {
 		filter = bson.M{"space_id": bson.ObjectIdHex(spaceID)}
@@ -57,28 +57,28 @@ func BuildDbFilterFromRequest(r api2go.Request) interface{} {
 		if filter == nil {
 			filter = bson.M{}
 		}
-		(filter.(bson.M))["workitem_id"] = workitemID
+		filter["workitem_id"] = workitemID
 	}
 	workitemsID, ok := GetPathParam(r, "workitemsID")
 	if ok {
 		if filter == nil {
 			filter = bson.M{}
 		}
-		(filter.(bson.M))["workitem_id"] = workitemsID
+		filter["workitem_id"] = workitemsID
 	}
 	iterationsID, ok := GetPathParam(r, "iterationsID")
 	if ok {
 		if filter == nil {
 			filter = bson.M{}
 		}
-		(filter.(bson.M))["iteration_id"] = iterationsID
+		filter["iteration_id"] = iterationsID
 	}
 	areasID, ok := GetPathParam(r, "areasID")
 	if ok {
 		if filter == nil {
 			filter = bson.M{}
 		}
-		(filter.(bson.M))["area_id"] = areasID
+		filter["area_id"] = areasID
 	}
 	return filter
 }

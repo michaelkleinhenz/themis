@@ -45,7 +45,7 @@ func (c AreaResource) getFilterFromRequest(r api2go.Request) (bson.M, *utils.Nes
 			}
 		default:
 			// build standard filter expression
-			filter = (utils.BuildDbFilterFromRequest(r)).(bson.M)
+			filter = utils.BuildDbFilterFromRequest(r)
 	}
 	return filter, nil
 }

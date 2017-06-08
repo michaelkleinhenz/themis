@@ -1,7 +1,5 @@
 package models
 
-// TODO METADATA, may need to put it into root, in several types!
-
 // TODO LINK SECTION, in several types!
 
 import (
