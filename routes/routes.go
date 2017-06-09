@@ -17,6 +17,7 @@ func initLocalRoutes(engine *gin.Engine) {
 	engine.PATCH("/api/reorder", reorder)
 	// fallback bogus /render endpoint, remove that when the core API gets sane
 	engine.POST("/api/render", renderMarkdown)
+	engine.GET("/api/filters", filters)
 }
 
 func keepAlive(c *gin.Context) {
@@ -32,4 +33,18 @@ func reorder(c *gin.Context) {
 	// WORKITEM only has id, type, attributes.version
 	// Response: data[WORKITEM] with WORKITEM being updated WorkItem
 	c.JSON(501, "Reordering using /reorder is not supported by this service.")
+}
+
+func filters(c *gin.Context) {
+	c.JSON(200, gin.H { "data": []gin.H {
+		gin.H { 
+			"attributes": gin.H { 
+				"description": "Filter by workitemtype",
+				"query": "filter[workitemtype]={id}",
+				"title": "Workitem type",
+				"type": "workitemtypes",
+			},
+			"type": "filters",
+		},
+	}})
 }

@@ -49,6 +49,14 @@ func (IterationStorage *IterationStorage) Insert(iteration models.Iteration) (bs
 	if err != nil {
 		return "", err
 	}
+	if iteration.ParentIterationID.Hex()=="" {
+		// this is the root iteration
+		iteration.ParentPath = "/"
+		iteration.ResolvedParentPath = "/"
+	} else {
+		iteration.ParentPath = "/" + iteration.ParentIterationID.Hex()
+		iteration.ResolvedParentPath = "/" + iteration.ParentIterationID.Hex()
+	}
 	if err = coll.Insert(iteration); err != nil {
 		utils.ErrorLog.Printf("Error while inserting new Iteration with ID %s into database: %s", iteration.ID, err.Error())
 		return "", err

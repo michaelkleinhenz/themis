@@ -118,6 +118,7 @@ func (space Space) GetCustomLinks(linkURL string) jsonapi.Links {
 	links := jsonapi.Links {
 		"self": jsonapi.Link { linkURL, nil, },
 		"reorderEndpoint": jsonapi.Link { baseLink + "/reorder", nil, },
+		"filters": jsonapi.Link { baseLink + "/filters", nil, },
 		"workitemlinktypes": jsonapi.Link { linkURL + "/linktypes", nil, },
 		"workitemtypes": jsonapi.Link { linkURL + "/workitemtypes", nil, },
 		"workitemlinkcategories": jsonapi.Link { linkURL + "/workitemlinkcategories", nil, },
