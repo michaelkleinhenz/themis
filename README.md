@@ -14,4 +14,8 @@ Install ginko, then:
 
   $ go build -ldflags "-X 'main.ThemisBuildDate=$(date -u '+%Y-%m-%d %H:%M:%S')' -X main.ThemisVersion=$(git log --pretty=format:'%h' -n 1)"
 
-  
+## Running
+
+  $ ./themis
+
+You will need a running MongoDB and you may want to set configuration params in `config.toml`. 
