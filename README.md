@@ -9,19 +9,19 @@ _Themis is the Titan goddess of divine law and order._
 Install ginko, then:
 
 ```
-  $ ~/gopath/bin/ginkgo -r -cover
+$ ~/gopath/bin/ginkgo -r -cover
 ```
 
 ## Building
 
 ```
-  $ go build -ldflags "-X 'main.ThemisBuildDate=$(date -u '+%Y-%m-%d %H:%M:%S')' -X main.ThemisVersion=$(git log --pretty=format:'%h' -n 1)"
+$ go build -ldflags "-X 'main.ThemisBuildDate=$(date -u '+%Y-%m-%d %H:%M:%S')' -X main.ThemisVersion=$(git log --pretty=format:'%h' -n 1)"
 ```
 
 ## Running
 
 ```
-  $ ./themis
+$ ./themis
 ```
 
 You will need a running MongoDB and you may want to set configuration params in `config.toml`. 
