@@ -1,6 +1,4 @@
-# Themis Project
-
-![alt text](https://raw.githubusercontent.com/michaelkleinhenz/themis/master/logo.png)
+![Themis Project](https://raw.githubusercontent.com/michaelkleinhenz/themis/master/logo.png)
 
 This is a standalone backend for fabric8-planner that uses Mongo as a storage backend.
 
