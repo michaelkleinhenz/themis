@@ -2,6 +2,7 @@ package models
 
 import (
 	"time"
+	"regexp"
 
 	"gopkg.in/mgo.v2/bson"
 	"github.com/manyminds/api2go/jsonapi"
@@ -112,8 +113,11 @@ func (space Space) GetReferencedIDs() []jsonapi.ReferenceID {
 
 // GetCustomLinks returns the custom links, namely the self link.
 func (space Space) GetCustomLinks(linkURL string) jsonapi.Links {
+	var re = regexp.MustCompile("(.*)/" + space.GetCollectionName() + "/.*")
+	baseLink := re.ReplaceAllString(linkURL, `$1`)
 	links := jsonapi.Links {
 		"self": jsonapi.Link { linkURL, nil, },
+		"reorderEndpoint": jsonapi.Link { baseLink + "/reorder", nil, },
 		"workitemlinktypes": jsonapi.Link { linkURL + "/linktypes", nil, },
 		"workitemtypes": jsonapi.Link { linkURL + "/workitemtypes", nil, },
 		"workitemlinkcategories": jsonapi.Link { linkURL + "/workitemlinkcategories", nil, },

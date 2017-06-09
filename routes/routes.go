@@ -14,9 +14,9 @@ func Init(engine *gin.Engine) {
 
 func initLocalRoutes(engine *gin.Engine) {
 	engine.GET("/ping", keepAlive)
-	engine.PATCH("/api/spaces/:spaceID/workitems/reorder", reorder)
+	engine.PATCH("/api/reorder", reorder)
 	// fallback bogus /render endpoint, remove that when the core API gets sane
-	engine.POST("/api/spaces/:spaceID/render", renderMarkdown)
+	engine.POST("/api/render", renderMarkdown)
 }
 
 func keepAlive(c *gin.Context) {
