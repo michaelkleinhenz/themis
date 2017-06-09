@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/manyminds/api2go"
 	"github.com/manyminds/api2go-adapter/gingonic"
 	"gopkg.in/gin-gonic/gin.v1"
@@ -11,10 +13,40 @@ import (
 	"themis/routes"
 	"themis/utils"
 	"themis/schema"
+	"fmt"
 )
+
+// ThemisVersion holds the current build version
+var ThemisVersion string
+
+// ThemisVendor holds the current build vendor
+var ThemisVendor = "ThemisProject"
+
+// ThemisName holds the current build name
+var ThemisName = "Themis Server"
+
+// ThemisCopyright holds the current build vendor
+var ThemisCopyright = "Copyright © ThemisProject, Licensed under the Apache License, Version 2.0"
+
+// ThemisAPIVersion holds the current API version
+var ThemisAPIVersion = "0.1"
+
+// ThemisBuildDate holds the current build version
+var ThemisBuildDate string 
 
 func main() {
 	utils.InitLogger()
+
+	// get commandline args
+	argsWithoutProg := os.Args[1:]
+	for _, a := range argsWithoutProg {
+		if a == "-version" {
+			fmt.Printf("%s %s\n", ThemisVendor, ThemisName)
+			fmt.Printf("Version %s, API Version %s, Built on %s\n", ThemisVersion, ThemisAPIVersion, ThemisBuildDate)
+			fmt.Printf("%s\n", ThemisCopyright)
+			os.Exit(0)
+		}
+	}
 
 	// load configuration and connect to database
 	configuration := utils.Load()
@@ -40,7 +72,7 @@ func main() {
 	// only for testing, setup an example dataset in storage
 	schema.SetupFixtureData(storageBackends)
 
-	// run the service
+	// configure the service
 	if (configuration.ServiceMode == utils.ModeProduction) {
 		gin.SetMode(gin.ReleaseMode)
 	} else {
@@ -53,7 +85,9 @@ func main() {
 		gingonic.New(r),
 	)
 
+	// serve static files from /static/
 	r.StaticFile("/", "./static/index.html")
+	// init the resources, each resource only gets the storage backends it needs
 	api.AddResource(models.Space{}, resources.SpaceResource { 
 		SpaceStorage: storageBackends.Space, 
 		WorkItemTypeStorage: storageBackends.WorkItemType,
@@ -64,7 +98,6 @@ func main() {
 		LinkStorage: storageBackends.Link,
 		LinkTypeStorage: storageBackends.LinkType,
 	})
-	// init the resources, each resource only gets the storage backends it needs
 	api.AddResource(models.WorkItem{}, resources.WorkItemResource{WorkItemStorage: storageBackends.WorkItem})
 	api.AddResource(models.Area{}, resources.AreaResource{AreaStorage: storageBackends.Area, WorkItemStorage: storageBackends.WorkItem})
 	api.AddResource(models.Comment{}, resources.CommentResource{CommentStorage: storageBackends.Comment})
@@ -74,6 +107,14 @@ func main() {
 	api.AddResource(models.LinkType{}, resources.LinkTypeResource{LinkTypeStorage: storageBackends.LinkType})
 	api.AddResource(models.User{}, resources.UserResource{UserStorage: storageBackends.User, SpaceStorage: storageBackends.Space, WorkItemStorage: storageBackends.WorkItem})
 	api.AddResource(models.WorkItemType{}, resources.WorkItemTypeResource{WorkItemTypeStorage: storageBackends.WorkItemType, WorkItemStorage: storageBackends.WorkItem, LinkTypeStorage: storageBackends.LinkType})
+	// init extra routes
 	routes.Init(r)
+	// add version route - thanks to some broken go concepts this must be added here
+	r.GET("/version", version)
+	// run the service
 	r.Run(configuration.ServicePort)
+}
+
+func version(c *gin.Context) {
+	c.JSON(200, gin.H { "vendor": ThemisVendor, "version": ThemisVersion, "build_date": ThemisBuildDate, "api_version": ThemisAPIVersion})
 }
