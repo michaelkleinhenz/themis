@@ -50,14 +50,6 @@ func (IterationStorage *IterationStorage) Insert(iteration models.Iteration) (bs
 	if err != nil {
 		return "", err
 	}
-	if iteration.ParentIterationID.Hex()=="" {
-		// this is the root iteration
-		iteration.ParentPath = "/"
-		iteration.ResolvedParentPath = "/"
-	} else {
-		iteration.ParentPath = "/" + iteration.ParentIterationID.Hex()
-		iteration.ResolvedParentPath = "/" + iteration.ParentIterationID.Hex()
-	}
 	if err = coll.Insert(iteration); err != nil {
 		utils.ErrorLog.Printf("Error while inserting new Iteration with ID %s into database: %s", iteration.ID, err.Error())
 		return "", err
@@ -127,6 +119,14 @@ func (IterationStorage *IterationStorage) GetAll(queryExpression interface{}) ([
 		utils.ErrorLog.Printf("Error while retrieving all Iterations from database: %s", err.Error())
 		return nil, err
 	}
+	var err error
+	for idx := range *allIterations {
+		(*allIterations)[idx].ParentPath, (*allIterations)[idx].ResolvedParentPath, err = IterationStorage.getParentPath((*allIterations)[idx].ID)
+		if err != nil {
+			utils.ErrorLog.Printf("Error while retrieving Iteration path for Iteration with ID %s from database: %s", (*allIterations)[idx].ID, err.Error())
+			return nil, err		
+		}
+	}
 	utils.DebugLog.Printf("Retrieved Iterations from database with filter %s.", queryExpression)
 	return *allIterations, nil
 }
@@ -142,6 +142,14 @@ func (IterationStorage *IterationStorage) GetAllPaged(queryExpression interface{
   if err := query.All(allIterations); err != nil { 
     utils.ErrorLog.Printf("Error while retrieving paged Iterations from database: %s", err.Error())
     return nil, err
+	}
+	var err error
+	for idx := range *allIterations {
+		(*allIterations)[idx].ParentPath, (*allIterations)[idx].ResolvedParentPath, err = IterationStorage.getParentPath((*allIterations)[idx].ID)
+		if err != nil {
+			utils.ErrorLog.Printf("Error while retrieving Iteration path for Iteration with ID %s from database: %s", (*allIterations)[idx].ID, err.Error())
+			return nil, err		
+		}
 	}
 	utils.DebugLog.Printf("Retrieved paged Iterations from database with filter %s.", queryExpression)
   return *allIterations, nil
@@ -177,16 +185,7 @@ func (IterationStorage *IterationStorage) NewDisplayID(spaceID string) (int, err
 
 func (IterationStorage *IterationStorage) getParentPath(id bson.ObjectId) (string, string, error) {
 	coll := IterationStorage.database.C(models.IterationName)
-		var result bson.M
-		// db.iterations.aggregate( [ { $match: { "_id": ObjectId("593fd3a73bf1112c55b247fb") } }, { $graphLookup: { from: "iterations", startWith: "$parent_iteration_id",
-			// connectFromField: "parent_iteration_id", connectToField: "_id", as: "iterationHierarchy" } }, { $project: { "_id":1, "name":1, "path": "$iterationHierarchy" } } ] )
-
-		/*
-		{ 
-			"_id" : ObjectId("593fd3a73bf1112c55b247fb"), 
-			"name" : "Iteration B Name", 
-			"path" : [ { "_id" : ObjectId("593fd3a73bf1112c55b247f7"), "display_id" : 0, "end_at" : ISODate("0001-01-01T00:00:00Z"), "start_at" : ISODate("0001-01-01T00:00:00Z"), "name" : "Root Iteration Name", "state" : "", "description" : "Root Iteration Description", "parent_path" : "/", "parent_path_resolved" : "/", "created_at" : ISODate("2017-06-13T11:59:35.830Z"), "updated_at" : ISODate("2017-06-13T11:59:35.830Z"), "space_id" : ObjectId("593fd3a73bf1112c55b247e8") }, { "_id" : ObjectId("593fd3a73bf1112c55b247fa"), "display_id" : 1, "end_at" : ISODate("0001-01-01T00:00:00Z"), "start_at" : ISODate("0001-01-01T00:00:00Z"), "name" : "Iteration A Name", "state" : "", "description" : "Iteration A Description", "parent_path" : "/593fd3a73bf1112c55b247f7", "parent_path_resolved" : "/593fd3a73bf1112c55b247f7", "created_at" : ISODate("2017-06-13T11:59:35.848Z"), "updated_at" : ISODate("2017-06-13T11:59:35.848Z"), "parent_iteration_id" : ObjectId("593fd3a73bf1112c55b247f7"), "space_id" : ObjectId("593fd3a73bf1112c55b247e8") } ] }
-		*/
+	var result bson.M
 	pipeline := []bson.M {
     bson.M{"$match": bson.M{ "_id": id }},
     bson.M{"$graphLookup": bson.M{
@@ -212,6 +211,10 @@ func (IterationStorage *IterationStorage) getParentPath(id bson.ObjectId) (strin
 	// string operations and JSON operations in go really suck hard! This is borderline painful!
 	var parentPathParts []string
 	var resolvedParentPathParts []string
+	if result["parent_iteration_id"] == nil {
+		// root iteration
+		return "/", "/", nil
+	}
 	currentSearchID := result["parent_iteration_id"].(bson.ObjectId)
 	for i:=0; i<len(result["path"].([]interface{})); i++ {
 		for _, segment := range result["path"].([]interface{}) {
