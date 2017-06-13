@@ -10,6 +10,8 @@ import (
 // This creates a default schema for the given spaceID and stores it in the storage backends.
 // It creates the template using code. We might want to load it from JSON or some other 
 // static source at some point. For now, the default schema is hardcoded.
+// To support different schemas, this has to pe parameterized. This is easy, but when we want to do this,
+// the schema should definitely be loaded from a JSON static source file (or copied from a schema db setup).
 func createSchemaForSpaceInStorage(spaceID bson.ObjectId, storageBackends database.StorageBackends) ([]bson.ObjectId, *bson.ObjectId, *bson.ObjectId, error) {
 	var err error
 	var workItemTypeIDs []bson.ObjectId
