@@ -106,9 +106,9 @@ func main() {
 	api.AddResource(models.Area{}, resources.AreaResource{AreaStorage: storageBackends.Area, WorkItemStorage: storageBackends.WorkItem})
 	api.AddResource(models.Comment{}, resources.CommentResource{CommentStorage: storageBackends.Comment})
 	api.AddResource(models.Iteration{}, resources.IterationResource{IterationStorage: storageBackends.Iteration, WorkItemStorage: storageBackends.WorkItem})
-	api.AddResource(models.Link{}, resources.LinkResource{LinkStorage: storageBackends.Link})
+	api.AddResource(models.Link{}, resources.LinkResource{LinkStorage: storageBackends.Link, WorkItemStorage: storageBackends.WorkItem})
 	api.AddResource(models.LinkCategory{}, resources.LinkCategoryResource{LinkCategoryStorage: storageBackends.LinkCategory, LinkTypeStorage: storageBackends.LinkType})
-	api.AddResource(models.LinkType{}, resources.LinkTypeResource{LinkTypeStorage: storageBackends.LinkType})
+	api.AddResource(models.LinkType{}, resources.LinkTypeResource{LinkTypeStorage: storageBackends.LinkType, WorkItemTypeStorage: storageBackends.WorkItemType, WorkItemStorage: storageBackends.WorkItem})
 	api.AddResource(models.User{}, resources.UserResource{UserStorage: storageBackends.User, SpaceStorage: storageBackends.Space, WorkItemStorage: storageBackends.WorkItem})
 	api.AddResource(models.WorkItemType{}, resources.WorkItemTypeResource{WorkItemTypeStorage: storageBackends.WorkItemType, WorkItemStorage: storageBackends.WorkItem, LinkTypeStorage: storageBackends.LinkType})
 	// init extra routes

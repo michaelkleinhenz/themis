@@ -24,4 +24,4 @@ $ go build -ldflags "-X 'main.ThemisBuildDate=$(date -u '+%Y-%m-%d %H:%M:%S')' -
 $ ./themis
 ```
 
-You will need a running MongoDB and you may want to set configuration params in `config.toml`. 
+You will need a running MongoDB 3.4 or higher and you may want to set configuration params in `config.toml`. 

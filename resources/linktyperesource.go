@@ -15,12 +15,44 @@ import (
 // LinkTypeResource for api2go routes.
 type LinkTypeResource struct {
 	LinkTypeStorage *database.LinkTypeStorage
+	WorkItemStorage *database.WorkItemStorage
+	WorkItemTypeStorage *database.WorkItemTypeStorage
+}
+
+func (c LinkTypeResource) getFilterFromRequest(r api2go.Request) (bson.M, error) {
+	var filter bson.M
+	// Getting reference context
+	sourceContext, sourceContextID, thisContext := utils.ParseContext(r)
+	switch sourceContext {
+		case models.WorkItemName:
+			workItem, err := c.WorkItemStorage.GetOne(bson.ObjectIdHex(sourceContextID))
+			if (err != nil) {
+				return nil, err
+			}
+			if thisContext == "source-link-types" {
+				localTypeID := workItem.BaseTypeID
+				// get LinkTypes where this WIT is in TargetWorkItemTypeID
+				filter = bson.M{"target_workitemtype_id": localTypeID}
+			}
+			if thisContext == "target-link-types" {
+				localTypeID := workItem.BaseTypeID
+				// get LinkTypes where this WIT is in SourceWorkItemTypeID
+				filter = bson.M{"source_workitemtype_id": localTypeID}
+			}
+		default:
+			// build standard filter expression
+			filter = utils.BuildDbFilterFromRequest(r)
+	}
+	return filter, nil
 }
 
 // FindAll LinkTypes.
 func (c LinkTypeResource) FindAll(r api2go.Request) (api2go.Responder, error) {
 	// build filter expression
-	var filter interface{} = utils.BuildDbFilterFromRequest(r)
+	filter, err := c.getFilterFromRequest(r)
+	if err != nil {
+		return &api2go.Response{}, err
+	}
 	linkTypes, _ := c.LinkTypeStorage.GetAll(filter)
 	return &api2go.Response{Res: linkTypes}, nil
 }
@@ -30,7 +62,10 @@ func (c LinkTypeResource) FindAll(r api2go.Request) (api2go.Responder, error) {
 func (c LinkTypeResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Responder, error) {
 
 	// build filter expression
-	var filter interface{} = utils.BuildDbFilterFromRequest(r)
+	filter, err := c.getFilterFromRequest(r)
+	if err != nil {
+		return 0, &api2go.Response{}, err
+	}
 
 	// parse out offset and limit
 	queryOffset, queryLimit, err := utils.ParsePaging(r)

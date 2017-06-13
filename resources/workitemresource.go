@@ -73,7 +73,7 @@ func (c WorkItemResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Respo
 
 	// build filter expression
 	filter, nestedErr := c.getFilterFromRequest(r)
-	if nestedErr.InnerError != nil {
+	if nestedErr != nil {
 		return 0, &api2go.Response{}, nestedErr.InnerError
 	}
 

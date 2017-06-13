@@ -32,36 +32,6 @@ func (c WorkItemTypeResource) getFilterFromRequest(r api2go.Request) (bson.M, er
 			if thisContext == "baseType" {
 				filter = bson.M{"_id": workItem.BaseTypeID}
 			}
-			if thisContext == "source-link-types" {
-				typeIDs := make([]bson.ObjectId, 0)
-				localTypeID := workItem.BaseTypeID
-				// get LinkTypes where this WIT is in TargetWorkItemTypeID
-				linkTypes, err := c.LinkTypeStorage.GetAll(bson.M{"target_workitemtype_id": localTypeID})
-				if (err != nil) {
-					return nil, err
-				}
-				// add SourceWorkItemTypeID of that type to the result list
-				for _, thisLinkType := range linkTypes {
-					typeIDs = append(typeIDs, thisLinkType.SourceWorkItemTypeID)
-				}
-				// return filter containing all returned ids
-				filter = bson.M{"_id": bson.M{ "$in": typeIDs }}
-			}
-			if thisContext == "target-link-types" {
-				typeIDs := make([]bson.ObjectId, 0)
-				localTypeID := workItem.BaseTypeID
-				// get LinkTypes where this WIT is in SourceWorkItemTypeID
-				linkTypes, err := c.LinkTypeStorage.GetAll(bson.M{"source_workitemtype_id": localTypeID})
-				if (err != nil) {
-					return nil, err
-				}
-				// add SourceWorkItemTypeID of that type to the result list
-				for _, thisLinkType := range linkTypes {
-					typeIDs = append(typeIDs, thisLinkType.TargetWorkItemTypeID)
-				}
-				// return filter containing all returned ids
-				filter = bson.M{"_id": bson.M{ "$in": typeIDs }}
-			}
 		case models.LinkTypeName:
 			linkType, err := c.LinkTypeStorage.GetOne(bson.ObjectIdHex(sourceContextID))
 			if (err != nil) {

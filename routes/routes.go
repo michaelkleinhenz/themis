@@ -24,8 +24,17 @@ func keepAlive(c *gin.Context) {
 	c.JSON(200, gin.H { "message": "n/a", })
 }
 
+// {"data":{"attributes":{"renderedContent":"\u003cp\u003eSee: \u003ca href=\"https://github.com/fabric8io/fabric8-planner/issues/537\" rel=\"nofollow\"\u003ehttps://github.com/fabric8io/fabric8-planner/issues/537\u003c/a\u003e\u003c/p\u003e\n"},"id":"a791cd56-3320-498f-b885-9d19555b8616","type":"rendering"}}
 func renderMarkdown(c *gin.Context) {
-	c.JSON(200, gin.H { "data": gin.H { "attributes": gin.H { "renderedContent": "Rendering markdown on server side is not supported by this API version." }}})
+	c.JSON(200, gin.H { 
+		"data": gin.H { 
+			"attributes": gin.H { 
+				"renderedContent": "<b>Rendering markdown on server side is not supported by this API version.</b>",
+			},
+		},
+		"id": "renderID",
+		"type": "rendering",
+	})
 }
 
 func reorder(c *gin.Context) {

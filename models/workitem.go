@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"time"
+	"strconv"
 
 	"github.com/manyminds/api2go/jsonapi"
 	"gopkg.in/mgo.v2/bson"
@@ -16,8 +17,8 @@ const WorkItemName = "workitems"
 // WorkItem is a base entity for Themis.
 type WorkItem struct {
 	ID               bson.ObjectId     `bson:"_id,omitempty" json:"-"`
-	Attributes       map[string]string `bson:"attributes" json:"attr"`
-	DisplayID				 int					  	 `bson:"display_id" json:"display_id"`
+	Attributes       map[string]string `bson:"attributes" json:"-"`
+	DisplayID				 int					  	 `bson:"display_id" json:"-"`
 	SpaceID          bson.ObjectId     `bson:"space_id" json:"-"`
 	CreatedAt        time.Time         `bson:"created_at" json:"-"`
 	UpdatedAt        time.Time         `bson:"updated_at" json:"-"`
@@ -47,7 +48,8 @@ func (workItem *WorkItem) GetCollectionName() string {
 
 // MarshalJSON is the custom Marshaller for dealing with the variable fields in attributes.
 func (workItem WorkItem) MarshalJSON() ([]byte, error) {
-	// for the Marshalling, we're only returning the fields in Attributes
+	// for the Marshalling, we're only returning the fields in Attributes plus the display_id
+	workItem.Attributes["_display_id"] = strconv.Itoa(workItem.DisplayID)
 	return json.Marshal(workItem.Attributes)
 }
 
@@ -111,13 +113,18 @@ func (workItem WorkItem) GetReferences() []jsonapi.Reference {
 			IsNotLoaded: false, // we want to have the data field
 		},
 		{
-			Type:        "workitemtypes",
+			Type:        "workitemlinktypes",
 			Name:        "source-link-types",
 			IsNotLoaded: true, // we do not want to have the data field
 		},
 		{
-			Type:        "workitemtypes",
+			Type:        "workitemlinktypes",
 			Name:        "target-link-types",
+			IsNotLoaded: true, // we do not want to have the data field
+		},
+		{
+			Type:        "links",
+			Name:        "links",
 			IsNotLoaded: true, // we do not want to have the data field
 		},
 	}

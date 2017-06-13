@@ -15,12 +15,37 @@ import (
 // LinkResource for api2go routes.
 type LinkResource struct {
 	LinkStorage *database.LinkStorage
+	WorkItemStorage *database.WorkItemStorage
+}
+
+func (c LinkResource) getFilterFromRequest(r api2go.Request) (bson.M, error) {
+	var filter bson.M
+	// Getting reference context
+	// TODO: find a more elegant way, maybe using function literals.
+	sourceContext, sourceContextID, thisContext := utils.ParseContext(r)
+	switch sourceContext {
+		case models.WorkItemName:
+			entity, err := c.WorkItemStorage.GetOne(bson.ObjectIdHex(sourceContextID))
+			if (err != nil) {
+				return nil, err
+			}
+			if thisContext == "links" {
+				filter = bson.M{"$or": []bson.M{ bson.M{ "source_workitem": entity.ID }, bson.M{ "target_workitem": entity.ID } } }
+			}
+		default:
+			// build standard filter expression
+			filter = utils.BuildDbFilterFromRequest(r)
+	}
+	return filter, nil
 }
 
 // FindAll Links.
 func (c LinkResource) FindAll(r api2go.Request) (api2go.Responder, error) {
 	// build filter expression
-	var filter interface{} = utils.BuildDbFilterFromRequest(r)
+	filter, err := c.getFilterFromRequest(r)
+	if err!=nil {
+		return &api2go.Response{}, err
+	}
 	links, _ := c.LinkStorage.GetAll(filter)
 	return &api2go.Response{Res: links}, nil
 }
@@ -30,8 +55,10 @@ func (c LinkResource) FindAll(r api2go.Request) (api2go.Responder, error) {
 func (c LinkResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Responder, error) {
 
 	// build filter expression
-	var filter interface{} = utils.BuildDbFilterFromRequest(r)
-
+	filter, err := c.getFilterFromRequest(r)
+	if err!=nil {
+		return 0, &api2go.Response{}, err
+	}
 	// parse out offset and limit
 	queryOffset, queryLimit, err := utils.ParsePaging(r)
 	if err!=nil {

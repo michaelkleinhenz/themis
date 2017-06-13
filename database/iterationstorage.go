@@ -2,6 +2,7 @@ package database
 
 import (
 	"errors"
+	"strings"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -108,6 +109,12 @@ func (IterationStorage *IterationStorage) GetOne(id bson.ObjectId) (models.Itera
 		utils.ErrorLog.Printf("Error while retrieving Iteration with ID %s from database: %s", iteration.ID, err.Error())
 		return *iteration, err
 	}
+	var err error
+	iteration.ParentPath, iteration.ResolvedParentPath, err = IterationStorage.getParentPath(iteration.ID)
+	if err != nil {
+		utils.ErrorLog.Printf("Error while retrieving Iteration path for Iteration with ID %s from database: %s", iteration.ID, err.Error())
+		return *iteration, err		
+	}
 	utils.DebugLog.Printf("Retrieved Iteration with ID %s from database.", iteration.ID.Hex())
 	return *iteration, nil
 }
@@ -168,3 +175,58 @@ func (IterationStorage *IterationStorage) NewDisplayID(spaceID string) (int, err
   return 0, nil  
 }
 
+func (IterationStorage *IterationStorage) getParentPath(id bson.ObjectId) (string, string, error) {
+	coll := IterationStorage.database.C(models.IterationName)
+		var result bson.M
+		// db.iterations.aggregate( [ { $match: { "_id": ObjectId("593fd3a73bf1112c55b247fb") } }, { $graphLookup: { from: "iterations", startWith: "$parent_iteration_id",
+			// connectFromField: "parent_iteration_id", connectToField: "_id", as: "iterationHierarchy" } }, { $project: { "_id":1, "name":1, "path": "$iterationHierarchy" } } ] )
+
+		/*
+		{ 
+			"_id" : ObjectId("593fd3a73bf1112c55b247fb"), 
+			"name" : "Iteration B Name", 
+			"path" : [ { "_id" : ObjectId("593fd3a73bf1112c55b247f7"), "display_id" : 0, "end_at" : ISODate("0001-01-01T00:00:00Z"), "start_at" : ISODate("0001-01-01T00:00:00Z"), "name" : "Root Iteration Name", "state" : "", "description" : "Root Iteration Description", "parent_path" : "/", "parent_path_resolved" : "/", "created_at" : ISODate("2017-06-13T11:59:35.830Z"), "updated_at" : ISODate("2017-06-13T11:59:35.830Z"), "space_id" : ObjectId("593fd3a73bf1112c55b247e8") }, { "_id" : ObjectId("593fd3a73bf1112c55b247fa"), "display_id" : 1, "end_at" : ISODate("0001-01-01T00:00:00Z"), "start_at" : ISODate("0001-01-01T00:00:00Z"), "name" : "Iteration A Name", "state" : "", "description" : "Iteration A Description", "parent_path" : "/593fd3a73bf1112c55b247f7", "parent_path_resolved" : "/593fd3a73bf1112c55b247f7", "created_at" : ISODate("2017-06-13T11:59:35.848Z"), "updated_at" : ISODate("2017-06-13T11:59:35.848Z"), "parent_iteration_id" : ObjectId("593fd3a73bf1112c55b247f7"), "space_id" : ObjectId("593fd3a73bf1112c55b247e8") } ] }
+		*/
+	pipeline := []bson.M {
+    bson.M{"$match": bson.M{ "_id": id }},
+    bson.M{"$graphLookup": bson.M{
+			"from": "iterations",
+			"startWith": "$parent_iteration_id",
+			"connectFromField": "parent_iteration_id",
+			"connectToField": "_id",
+			"as": "iterationHierarchy",
+    }},
+    bson.M{ "$project": bson.M{
+			"_id": 1,
+			"name": 1,
+			"parent_iteration_id": 1,
+			"path": "$iterationHierarchy",
+    }},
+	}
+	err := coll.Pipe(pipeline).One(&result)
+  if err != nil { 
+    utils.ErrorLog.Printf("Error while retrieving Iterations graph path from database: %s", err.Error())
+    return "", "", err
+	}
+	// iterate over the result, assemble the paths (this is needed this way because Mongo does not guarantee an order of elements in the result set)
+	// string operations and JSON operations in go really suck hard! This is borderline painful!
+	var parentPathParts []string
+	var resolvedParentPathParts []string
+	currentSearchID := result["parent_iteration_id"].(bson.ObjectId)
+	for i:=0; i<len(result["path"].([]interface{})); i++ {
+		for _, segment := range result["path"].([]interface{}) {
+			thisSegment := segment.(bson.M)
+			if (thisSegment["_id"].(bson.ObjectId)).Hex() == currentSearchID.Hex() {
+				parentPathParts = append([]string{(thisSegment["_id"].(bson.ObjectId)).Hex()}, parentPathParts...)
+				resolvedParentPathParts = append([]string{(thisSegment["name"].(string))}, resolvedParentPathParts...)
+				if thisSegment["parent_iteration_id"] != nil {
+					currentSearchID = (thisSegment["parent_iteration_id"].(bson.ObjectId))
+				}
+			}
+		}
+	}
+	// add the root ("/") in front (actual "/" gets inserted by the Join)
+	parentPathParts = append([]string{""}, parentPathParts...)
+	resolvedParentPathParts = append([]string{""}, resolvedParentPathParts...)
+	return strings.Join(parentPathParts, "/"), strings.Join(resolvedParentPathParts, "/"), nil
+}
