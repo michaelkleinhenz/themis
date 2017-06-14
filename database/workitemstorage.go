@@ -11,6 +11,19 @@ import (
   "themis/models"
 )
 
+// IWorkItemStorage is the interface for the workitem storage.
+type IWorkItemStorage interface {
+    Insert(workItem models.WorkItem) (bson.ObjectId, error)
+    Update(workItem models.WorkItem) error
+    Delete(id bson.ObjectId) error
+    GetOne(id bson.ObjectId) (models.WorkItem, error)
+    GetAll(queryExpression interface{}) ([]models.WorkItem, error)
+    GetAllChildIDs(id bson.ObjectId) ([]bson.ObjectId, error)
+    GetAllPaged(queryExpression interface{}, offset int, limit int) ([]models.WorkItem, error)
+    GetAllCount(queryExpression interface{}) (int, error)
+    NewDisplayID(spaceID string) (int, error)
+}
+
 // WorkItemStorage is the storage backend for WorkItems.
 type WorkItemStorage struct {
 	database *mgo.Database

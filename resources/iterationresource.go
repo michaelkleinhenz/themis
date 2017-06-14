@@ -14,8 +14,8 @@ import (
 
 // IterationResource for api2go routes.
 type IterationResource struct {
-	IterationStorage *database.IterationStorage
-	WorkItemStorage *database.WorkItemStorage
+	IterationStorage database.IIterationStorage
+	WorkItemStorage database.IWorkItemStorage
 }
 
 func (c IterationResource) getFilterFromRequest(r api2go.Request) (bson.M, *utils.NestedEntityError) {

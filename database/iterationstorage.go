@@ -11,6 +11,20 @@ import (
 	"themis/utils"
 )
 
+// IIterationStorage is the interface for the iteration storage.
+type IIterationStorage interface {
+    IsRoot(id bson.ObjectId) (bool, error)
+    Insert(iteration models.Iteration) (bson.ObjectId, error)
+		Update(iteration models.Iteration) error
+		Delete(id bson.ObjectId) error
+		GetOne(id bson.ObjectId) (models.Iteration, error)
+		GetAll(queryExpression interface{}) ([]models.Iteration, error)
+		GetAllPaged(queryExpression interface{}, offset int, limit int) ([]models.Iteration, error)
+		GetAllCount(queryExpression interface{}) (int, error)
+		NewDisplayID(spaceID string) (int, error)
+		GetParentPath(id bson.ObjectId) (string, string, error)
+}
+
 // IterationStorage is the storage backend for Iterations.
 type IterationStorage struct {
 	database *mgo.Database
@@ -102,7 +116,7 @@ func (IterationStorage *IterationStorage) GetOne(id bson.ObjectId) (models.Itera
 		return *iteration, err
 	}
 	var err error
-	iteration.ParentPath, iteration.ResolvedParentPath, err = IterationStorage.getParentPath(iteration.ID)
+	iteration.ParentPath, iteration.ResolvedParentPath, err = IterationStorage.GetParentPath(iteration.ID)
 	if err != nil {
 		utils.ErrorLog.Printf("Error while retrieving Iteration path for Iteration with ID %s from database: %s", iteration.ID, err.Error())
 		return *iteration, err		
@@ -121,7 +135,7 @@ func (IterationStorage *IterationStorage) GetAll(queryExpression interface{}) ([
 	}
 	var err error
 	for idx := range *allIterations {
-		(*allIterations)[idx].ParentPath, (*allIterations)[idx].ResolvedParentPath, err = IterationStorage.getParentPath((*allIterations)[idx].ID)
+		(*allIterations)[idx].ParentPath, (*allIterations)[idx].ResolvedParentPath, err = IterationStorage.GetParentPath((*allIterations)[idx].ID)
 		if err != nil {
 			utils.ErrorLog.Printf("Error while retrieving Iteration path for Iteration with ID %s from database: %s", (*allIterations)[idx].ID, err.Error())
 			return nil, err		
@@ -145,7 +159,7 @@ func (IterationStorage *IterationStorage) GetAllPaged(queryExpression interface{
 	}
 	var err error
 	for idx := range *allIterations {
-		(*allIterations)[idx].ParentPath, (*allIterations)[idx].ResolvedParentPath, err = IterationStorage.getParentPath((*allIterations)[idx].ID)
+		(*allIterations)[idx].ParentPath, (*allIterations)[idx].ResolvedParentPath, err = IterationStorage.GetParentPath((*allIterations)[idx].ID)
 		if err != nil {
 			utils.ErrorLog.Printf("Error while retrieving Iteration path for Iteration with ID %s from database: %s", (*allIterations)[idx].ID, err.Error())
 			return nil, err		
@@ -183,7 +197,8 @@ func (IterationStorage *IterationStorage) NewDisplayID(spaceID string) (int, err
   return 0, nil  
 }
 
-func (IterationStorage *IterationStorage) getParentPath(id bson.ObjectId) (string, string, error) {
+// GetParentPath returns the parent path and the resolved parent path based on a graph traversal in the database.
+func (IterationStorage *IterationStorage) GetParentPath(id bson.ObjectId) (string, string, error) {
 	coll := IterationStorage.database.C(models.IterationName)
 	var result bson.M
 	pipeline := []bson.M {
